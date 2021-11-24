@@ -1,6 +1,7 @@
 package orm;
 
 import orm.scanner.ClassFinder;
+import orm.scanner.ClassScanner;
 
 import java.util.Set;
 
@@ -11,5 +12,7 @@ public class Main {
         for (Class cl : annotatedClasses) {
             System.out.println(cl.getName());
         }
+        ClassScanner classScanner = new ClassScanner();
+        classScanner.scanClasses(annotatedClasses);
     }
 }
