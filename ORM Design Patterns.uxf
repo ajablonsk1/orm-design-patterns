@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.3">
+  <zoom_level>13</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>520</x>
+      <y>377</y>
+      <w>481</w>
+      <h>273</h>
+    </coordinates>
+    <panel_attributes>Session
+--
+-persistanceObjects: Map&lt;Class, List&lt;Object&gt; &gt;
+-executor: Executor
+--
++flush()
++save(Object object)
++load(Class cl, int id)
++delete(Object object)
++refresh(Object object)
+-createTables(List&lt;Class&gt; classes)
++close()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>39</x>
+      <y>442</y>
+      <w>377</w>
+      <h>156</h>
+    </coordinates>
+    <panel_attributes>ClassLoader
+--
+_+searchForAnnotatedClasses(): List&lt;Class&gt;_
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>585</x>
+      <y>715</y>
+      <w>325</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>Executor
+--
+-connection: Connection
+--
++executeQuery(SQLQuery query)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1170</x>
+      <y>481</y>
+      <w>351</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>SQLQuery // prepared statemant
+--
+-query: String
+--
++setQuery(String query)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>741</x>
+      <y>637</y>
+      <w>39</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>572</x>
+      <y>91</y>
+      <w>403</w>
+      <h>143</h>
+    </coordinates>
+    <panel_attributes>SessionFactory
+--
+-instance: SessionFactory
+--
++createSession(String fileName): Session
+_+getInstance(): SessionFactory_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>962</x>
+      <y>91</y>
+      <w>117</w>
+      <h>91</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;70.0;10.0;70.0;50.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>754</x>
+      <y>221</y>
+      <w>143</w>
+      <h>182</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+&lt;&lt;instantiates&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;120.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>403</x>
+      <y>507</y>
+      <w>143</w>
+      <h>39</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>988</x>
+      <y>507</y>
+      <w>208</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+&lt;&lt;instantiates&gt;&gt;</panel_attributes>
+    <additional_attributes>140.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>897</x>
+      <y>572</y>
+      <w>481</w>
+      <h>234</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>350.0;10.0;350.0;160.0;10.0;160.0</additional_attributes>
+  </element>
+</diagram>
