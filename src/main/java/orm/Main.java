@@ -2,6 +2,7 @@ package orm;
 
 import orm.scanner.ClassFinder;
 import orm.scanner.ClassScanner;
+import orm.sql.CreateTableSqlBuilder;
 
 import java.util.Set;
 
