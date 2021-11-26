@@ -30,6 +30,10 @@ public class CreateTableSqlBuilder extends SqlBuilder {
         addStatementToQuery(sql, tables, "", ", ").
             addStatementToQuery(sql, columns, "(", ", ");
         sql.append(");");
+
+        tables.clear();
+        columns.clear();
+
         return sql.toString();
     }
 }

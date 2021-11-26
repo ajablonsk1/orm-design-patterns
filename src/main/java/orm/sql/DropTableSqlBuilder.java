@@ -20,6 +20,9 @@ public class DropTableSqlBuilder extends SqlBuilder{
         StringBuilder sql = new StringBuilder("DROP TABLE");
         addStatementToQuery(sql, tables, " ", ", ");
         sql.append(";");
+
+        tables.clear();
+
         return sql.toString();
     }
 }

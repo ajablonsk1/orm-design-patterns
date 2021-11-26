@@ -11,6 +11,8 @@ public class SelectRecordsSqlBuilder extends SqlBuilder{
 
     private List<String> wheres = new LinkedList<>();
 
+    private List<String> groupBys = new LinkedList<>();
+
     private List<String> orderBys = new LinkedList<>();
 
     private List<String> joins = new LinkedList<>();
@@ -18,8 +20,6 @@ public class SelectRecordsSqlBuilder extends SqlBuilder{
     private List<String> leftJoins = new LinkedList<>();
 
     private List<String> havings = new LinkedList<String>();
-
-    private List<SelectRecordsSqlBuilder> unions = new LinkedList<>();
 
     private boolean distinct = false;
 
@@ -44,8 +44,8 @@ public class SelectRecordsSqlBuilder extends SqlBuilder{
         return this;
     }
 
-    public SelectRecordsSqlBuilder orderBy(String columnName){
-        this.orderBys.add(columnName);
+    public SelectRecordsSqlBuilder groupBy(String columnName){
+        this.groupBys.add(columnName);
         return this;
     }
 
@@ -79,13 +79,18 @@ public class SelectRecordsSqlBuilder extends SqlBuilder{
         return this;
     }
 
-    public SelectRecordsSqlBuilder union(SelectRecordsSqlBuilder union){
-        this.unions.add(union);
+    public SelectRecordsSqlBuilder andForWhere(String condition){
+        this.wheres.add(condition);
         return this;
     }
 
-    public SelectRecordsSqlBuilder and(String where){
-        this.wheres.add(where);
+    public SelectRecordsSqlBuilder orderBy(String columnName){
+        this.orderBys.add(columnName);
+        return this;
+    }
+
+    public SelectRecordsSqlBuilder andForHaving(String condition){
+        this.havings.add(condition);
         return this;
     }
 
@@ -99,20 +104,50 @@ public class SelectRecordsSqlBuilder extends SqlBuilder{
         return this;
     }
 
+    public SelectRecordsSqlBuilder distinct(){
+        this.distinct = true;
+        return this;
+    }
+
     @Override
     public String toString(){
         StringBuilder sql = new StringBuilder("SELECT ");
         if(distinct){
-            sql.append("distinct ");
+            sql.append("DISTINCT ");
         }
         if(columns.size() == 0){
-            sql.append("(*)");
+            sql.append("(*) ");
         }
         else{
             addStatementToQuery(sql, columns, "", ", ");
         }
 
-        // TO END
+        addStatementToQuery(sql, tables, "FROM ", ", ")
+                .addStatementToQuery(sql, joins, " JOIN ", " JOIN ")
+                .addStatementToQuery(sql, leftJoins, " JOIN LEFT ", " JOIN LEFT ")
+                .addStatementToQuery(sql, wheres, " WHERE ", " AND ")
+                .addStatementToQuery(sql, groupBys, " GROUP BY ", ", " )
+                .addStatementToQuery(sql, havings, " HAVING ", " AND ")
+                .addStatementToQuery(sql, orderBys, " ORDER BY ", ", ");
+
+        if(limit > 0)
+            sql.append(" limit ")
+                    .append(limit);
+        if(offset > 0)
+            sql.append(", ")
+                    .append(offset);
+
+        sql.append(";");
+
+        columns.clear();
+        tables.clear();
+        joins.clear();
+        leftJoins.clear();
+        wheres.clear();
+        columns.clear();
+        groupBys.clear();
+        havings.clear();
+        orderBys.clear();
 
         return sql.toString();
     }

@@ -3,20 +3,20 @@ package orm.sql;
 import java.util.LinkedList;
 import java.util.List;
 
-public class InsertRecordSqlBuilder extends SqlBuilder{
+public class InsertRecordsSqlBuilder extends SqlBuilder{
 
     private List<String> tables = new LinkedList<>();
 
     private List<String> values = new LinkedList<>();
 
-    public InsertRecordSqlBuilder(){};
+    public InsertRecordsSqlBuilder(){};
 
-    public InsertRecordSqlBuilder table(String tableName){
+    public InsertRecordsSqlBuilder table(String tableName){
         this.tables.add(tableName);
         return this;
     }
 
-    public InsertRecordSqlBuilder values(String values){
+    public InsertRecordsSqlBuilder values(String values){
         this.values.add(values);
         return this;
     }
@@ -27,6 +27,10 @@ public class InsertRecordSqlBuilder extends SqlBuilder{
         addStatementToQuery(sql, tables, " ", ", ")
                 .addStatementToQuery(sql, values, " VALUES(", ", ");
         sql.append(");");
+
+        tables.clear();
+        values.clear();
+
         return sql.toString();
     }
 }
