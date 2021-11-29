@@ -28,12 +28,12 @@ public class SQLExecutor {
         this.urlHasCredentials = true;
     }
 
-    public List<Optional<RowSet>> executeUnit(List<String> unitOfWork) {
+    public List<Optional<RowSet>> execute(List<String> queries) {
         List<Optional<RowSet>> results = new ArrayList<>();
-        try (Connection conn = urlHasCredentials ? DriverManager.getConnection(url, user, password) : DriverManager.getConnection(url)) {
+        try (Connection conn = getConnection()){
             conn.setAutoCommit(false);
-            for (String query : unitOfWork) {
-                results.add(execute(conn, query));
+            for (String query : queries) {
+                results.add(executeSingleQuery(conn, query));
             }
             conn.commit();
         } catch (SQLException e) {
@@ -43,22 +43,34 @@ public class SQLExecutor {
         return results;
     }
 
-    public Optional<RowSet> execute(Connection conn, String query) {
-        Optional<RowSet> result = null;
-        try (PreparedStatement statement = conn.prepareStatement(query)) {
+    public Optional<RowSet> execute(String query) {
+        Optional<RowSet> result = Optional.empty();
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
+            result = executeSingleQuery(conn, query);
+            conn.commit();
+        } catch (SQLException e) {
+            // TODO: obsługa błędu
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    private Optional<RowSet> executeSingleQuery(Connection conn, String query) throws SQLException {
+        Optional<RowSet> result = Optional.empty();
+        try (PreparedStatement statement = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             boolean hasResults = statement.execute();
             if (hasResults) {
                 ResultSet resultSet = statement.getResultSet();
                 RowSetFactory rowSetFactory = RowSetProvider.newFactory();
                 result = Optional.of(rowSetFactory.createCachedRowSet());
                 resultSet.close();
-            } else {
-                result = Optional.empty();
             }
-        } catch (SQLException e) {
-            // TODO: obsługa błędu
-            e.printStackTrace();
         }
         return result;
+    }
+
+    private Connection getConnection() throws SQLException {
+        return urlHasCredentials ? DriverManager.getConnection(url, user, password) : DriverManager.getConnection(url);
     }
 }
