@@ -2,8 +2,8 @@ package orm;
 
 import orm.scanner.ClassFinder;
 import orm.scanner.ClassScanner;
-import orm.sql.CreateTableSqlBuilder;
-
+import orm.session.Session;
+import orm.session.SessionFactory;
 import java.util.Set;
 
 public class Main {
@@ -15,5 +15,7 @@ public class Main {
         }
         ClassScanner classScanner = new ClassScanner();
         classScanner.scanClasses(annotatedClasses);
+        Session session = SessionFactory.getInstance().createSession();
+
     }
 }

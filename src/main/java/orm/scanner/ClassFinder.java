@@ -52,6 +52,7 @@ public class ClassFinder {
 
     private void processJarFile(File file) {
         try {
+            System.out.println("Processing jar-file: "+ file.toString());
             JarFile jarFile = new JarFile(file);
             Iterator<JarEntry> iterator = jarFile.entries().asIterator();
 

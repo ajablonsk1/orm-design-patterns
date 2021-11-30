@@ -8,24 +8,39 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class SQLExecutor {
+public class SqlExecutor {
     private final String url;
     private final String user;
     private final String password;
+    private final String databaseName;
     private final Boolean urlHasCredentials;
 
-    public SQLExecutor(String url) {
+
+    public SqlExecutor(String url, String databaseName) {
         this.url = url;
         this.user = null;
         this.password = null;
+        this.databaseName = databaseName;
         this.urlHasCredentials = false;
+        executeUseDatabaseQuery(databaseName);
     }
 
-    public SQLExecutor(String url, String user, String password) {
+    public SqlExecutor(String url, String user, String password, String databaseName) {
         this.url = url;
         this.user = user;
         this.password = password;
+        this.databaseName = databaseName;
         this.urlHasCredentials = true;
+
+        executeUseDatabaseQuery(databaseName);
+    }
+
+    private void executeUseDatabaseQuery(String databaseName) {
+        try {
+            this.executeSingleQuery(getConnection(), "USE "+ databaseName);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public List<Optional<RowSet>> execute(List<String> queries) {
