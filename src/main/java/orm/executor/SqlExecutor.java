@@ -12,35 +12,28 @@ public class SqlExecutor {
     private final String url;
     private final String user;
     private final String password;
-    private final String databaseName;
     private final Boolean urlHasCredentials;
 
 
-    public SqlExecutor(String url, String databaseName) {
+    public SqlExecutor(String url) {
         this.url = url;
         this.user = null;
         this.password = null;
-        this.databaseName = databaseName;
         this.urlHasCredentials = false;
-        executeUseDatabaseQuery(databaseName);
     }
 
-    public SqlExecutor(String url, String user, String password, String databaseName) {
+    public SqlExecutor(String url, String user, String password) {
         this.url = url;
         this.user = user;
         this.password = password;
-        this.databaseName = databaseName;
         this.urlHasCredentials = true;
-
-        executeUseDatabaseQuery(databaseName);
     }
 
-    private void executeUseDatabaseQuery(String databaseName) {
-        try {
-            this.executeSingleQuery(getConnection(), "USE "+ databaseName);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public SqlExecutor(String url, String user, String password, String database) {
+        this.url = url.concat("/"+database);
+        this.user = user;
+        this.password = password;
+        this.urlHasCredentials = true;
     }
 
     public List<Optional<CachedRowSet>> execute(List<String> queries) {

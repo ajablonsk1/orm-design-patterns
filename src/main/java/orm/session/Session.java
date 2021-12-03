@@ -15,10 +15,10 @@ public class Session {
     // konstruktor package-private
     // Ważne, aby tylko klasa SessionFactory mogła tworzyć obiekty klasy Session
     Session() {
-        this.executor = new SqlExecutor("jdbc:mysql://mysql.agh.edu.pl:3306", "pmakare1", "kmjUCKSydDxdZ022", "pmakare1");
-
-
-
+        //this.executor = new SqlExecutor("jdbc:mysql://mysql.agh.edu.pl:3306", "pmakare1", "kmjUCKSydDxdZ022", "pmakare1");
+        this.executor = new SqlExecutor("jdbc:mysql://localhost:3306", "root", "password", "test");
+        ClassFinder classFinder = new ClassFinder();
+        ClassScanner classScanner = new ClassScanner(executor);
+        classScanner.scanClasses(classFinder.loadClasses());
     }
-
 }

@@ -1,14 +1,25 @@
 package orm.scanner;
 
 import orm.annotations.*;
+import orm.executor.SqlExecutor;
+import orm.sql.CommandType;
+import orm.sql.QueryBuilder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class ClassScanner {
+
+    private final SqlExecutor executor;
+
+    public ClassScanner(SqlExecutor executor) {
+        this.executor = executor;
+    }
 
     public void scanClasses(Set<Class> classes) {
         for (Class currentClass : classes) {
@@ -20,8 +31,11 @@ public class ClassScanner {
         Annotation[] classAnnotations = currentClass.getAnnotations();
         for (Annotation annotation : classAnnotations) {
             if (annotation.annotationType() == Entity.class) {
-                // TODO: wywołanie buildera
-                // builder.createTable(cl)
+                QueryBuilder queryBuilder = new QueryBuilder();
+                String query = queryBuilder.setCommandType(CommandType.CREATE)
+                        .addTable(currentClass)
+                        .toString();
+                executor.execute(query);
             }
             // TODO: pozostałe adnotacje, jeżeli będą
         }
@@ -33,7 +47,12 @@ public class ClassScanner {
                 Class annotationType = annotation.annotationType();
                 // TODO: tworzenie relacji między klasami
                 if (annotationType == Column.class) {
-
+                    QueryBuilder queryBuilder = new QueryBuilder();
+                    String query = queryBuilder.setCommandType(CommandType.ALTER)
+                            .addTable(currentClass)
+                            .addColumn(field)
+                            .toString();
+                    executor.execute(query);
                 } else if (annotationType == Id.class) {
 
                 } else if (annotationType == ManyToMany.class) {
@@ -73,5 +92,26 @@ public class ClassScanner {
             throw new IllegalArgumentException("Field not parametrised by any type");
         }
         return ret;
+    }
+
+    public List<Object> getColumnValues(Object object) {
+        List<Object> result = new ArrayList<>();
+        Class cl = object.getClass();
+        Field[] fiels = cl.getFields();
+        for (Field field : fiels) {
+            Annotation[] fieldAnnotations = field.getAnnotations();
+            for (Annotation annotation : fieldAnnotations) {
+                if (annotation.annotationType() == Column.class) {
+                    field.setAccessible(true);
+                    try {
+                        result.add(field.get(object));
+                    } catch (IllegalAccessException e) {
+                        // TODO: obsługa błędu
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return result;
     }
 }
