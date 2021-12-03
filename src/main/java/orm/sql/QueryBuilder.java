@@ -65,21 +65,6 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder addColumn(Object object) {
-        if (commandType == null) {
-            throw new IllegalStateException("Command type not set");
-        }
-        if (commandType == CommandType.CREATE || commandType == CommandType.ALTER) {
-            String type = getSqlTypeFromClass(object.getClass());
-            columns.add(object.toString() + " " + type);
-        }
-        if (commandType == CommandType.SELECT || commandType == CommandType.INSERT) {
-            columns.add(object.getClass().getName().toLowerCase());
-        }
-        return this;
-    }
-
-
     public QueryBuilder addCondition(String condition) {
         if (commandType == null) {
             throw new IllegalStateException("Command type not set");
@@ -92,7 +77,7 @@ public class QueryBuilder {
         if (commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        values.add(value.toString());
+        values.add(stringValue(value));
         return this;
     }
 
@@ -152,7 +137,7 @@ public class QueryBuilder {
         if (commandType != CommandType.UPDATE) {
             throw new IllegalStateException("Command is not set to UPDATE");
         }
-        setColumns.add(column + "=" + value.toString());
+        setColumns.add(column + "=" + stringValue(value));
         return this;
     }
 
@@ -163,7 +148,7 @@ public class QueryBuilder {
         if (commandType != CommandType.UPDATE) {
             throw new IllegalStateException("Command is not set to UPDATE");
         }
-        setColumns.add(column.getName().toLowerCase() + "=" + value.toString());
+        setColumns.add(column.getName().toLowerCase() + "=" + stringValue(value));
         return this;
     }
 
@@ -268,6 +253,12 @@ public class QueryBuilder {
         return sql.toString();
     }
 
+    private String stringValue(Object value) {
+        if (value.getClass() == Boolean.class) {
+            return (Boolean) value ? String.valueOf(1) : String.valueOf(0);
+        }
+        return value.toString();
+    }
 
     private String getSqlTypeFromClass(Class cl) {
         if (cl == String.class || cl == Character.class || cl == char.class) {

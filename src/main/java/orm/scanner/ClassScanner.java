@@ -9,8 +9,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class ClassScanner {
@@ -94,8 +94,8 @@ public class ClassScanner {
         return ret;
     }
 
-    public List<Object> getColumnValues(Object object) {
-        List<Object> result = new ArrayList<>();
+    public Map<Field, Object> getColumnValues(Object object) {
+        Map<Field, Object> result = new HashMap<>();
         Class cl = object.getClass();
         Field[] fiels = cl.getFields();
         for (Field field : fiels) {
@@ -104,7 +104,7 @@ public class ClassScanner {
                 if (annotation.annotationType() == Column.class) {
                     field.setAccessible(true);
                     try {
-                        result.add(field.get(object));
+                        result.put(field, field.get(object));
                     } catch (IllegalAccessException e) {
                         // TODO: obsługa błędu
                         e.printStackTrace();
