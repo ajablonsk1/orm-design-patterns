@@ -9,9 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ClassScanner {
 
@@ -27,6 +25,7 @@ public class ClassScanner {
         }
     }
 
+    // TODO: Przeniesienie tworzenia tabel do osobnej klasy
     private void scanClass(Set<Class> classes, Class currentClass) {
         Annotation[] classAnnotations = currentClass.getAnnotations();
         for (Annotation annotation : classAnnotations) {
@@ -47,6 +46,7 @@ public class ClassScanner {
                 Class annotationType = annotation.annotationType();
                 // TODO: tworzenie relacji między klasami
                 if (annotationType == Column.class) {
+                    // TODO: Dodanie kolumn z klas nadrzędnych
                     QueryBuilder queryBuilder = new QueryBuilder();
                     String query = queryBuilder.setCommandType(CommandType.ALTER)
                             .addTable(currentClass)
@@ -73,7 +73,6 @@ public class ClassScanner {
         }
 
     }
-
     private Class getElementClass(Field field) {
         Type type = field.getGenericType();
         Class ret;
@@ -94,23 +93,40 @@ public class ClassScanner {
         return ret;
     }
 
-    public Map<Field, Object> getColumnValues(Object object) {
-        Map<Field, Object> result = new HashMap<>();
-        Class cl = object.getClass();
-        Field[] fiels = cl.getFields();
-        for (Field field : fiels) {
-            Annotation[] fieldAnnotations = field.getAnnotations();
-            for (Annotation annotation : fieldAnnotations) {
-                if (annotation.annotationType() == Column.class) {
-                    field.setAccessible(true);
-                    try {
-                        result.put(field, field.get(object));
-                    } catch (IllegalAccessException e) {
-                        // TODO: obsługa błędu
-                        e.printStackTrace();
-                    }
+    /**
+     * Returns list of {@code Field}, {@code Object} pairs, representing
+     * values of argument fields annotated with {@code @Column} annotation.
+     * Fields are searched for whole class hierarchy till class not annotated
+     * with {@code @Entity} annotation is found.
+     * @param object object, of which fields are to be returned by this method
+     * @return       map of {@code Field}, {@code Object} pairs
+     */
+    public List<Map.Entry<Field, Object>> getColumnValues(Object object) {
+        List<Map.Entry<Field, Object>> result = new ArrayList<>();
+        List<Field> columns = getColumns(object.getClass());
+        for (Field field : columns) {
+            field.setAccessible(true);
+            try {
+                result.add(new AbstractMap.SimpleEntry<>(field, field.get(object)));
+            } catch (IllegalAccessException e) {
+                // TODO: obsługa błędu
+                e.printStackTrace();
+            }
+            field.setAccessible(false);
+        }
+        return result;
+    }
+
+    public List<Field> getColumns(Class cl) {
+        List<Field> result = new ArrayList<>();
+        while (cl.isAnnotationPresent(Entity.class)) {
+            Field[] fields = cl.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.isAnnotationPresent(Column.class)) {
+                    result.add(field);
                 }
             }
+            cl = cl.getSuperclass();
         }
         return result;
     }
