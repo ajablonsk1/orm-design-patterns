@@ -37,7 +37,7 @@ Do tego modelu należą wszystkie klasy z adnotacją @Entity w obrębie aplikacj
 ### 9. Przykłady użycia biblioteki przez klienta
 
 Klasa reprezentująca encję:
-```aidl
+```
 @Entity
 public class Person {
 
@@ -53,7 +53,7 @@ public class Person {
 ```
 
 Zapisanie obiektu w bazie:
-```aidl
+```
 SessionFactory sessionFactory = SessionFactory.getInstance();
 Session session = sessionFactory.createSession();
 
@@ -66,7 +66,7 @@ session.close();
 ```
 
 Załadowanie obiektu z bazy i jego aktualizacja:
-```aidl
+```
 SessionFactory sessionFactory = SessionFactory.getInstance();
 Session session = sessionFactory.createSession();
 
