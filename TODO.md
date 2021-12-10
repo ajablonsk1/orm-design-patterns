@@ -1,4 +1,4 @@
-###Aktualny podział pracy (do 13.12.2021):
+### Aktualny podział pracy (do 13.12.2021):
 - Diagramy i opisy modułów:
 - - Session - Paweł
 - - Relacje, adnotacje - Piotrek
@@ -61,7 +61,7 @@ Do ustalenia:
 3. Wydzielenie tworzenia tabel z ClassScanner do osobnej klasy, ClassScanner zajmowałby się jedynie szukaniem pól, adnotacji, klas nadrzędnych
 4. Co to znaczy "konfiguracja modelu encji dziedziny powinna realizować paradygmat „by exception”"
 
-Stara dokumentacja - https://docs.google.com/document/d/1ATEsbiftdQEcgce-aWxOYNcQAnRioykP7WYx5PvhvUk/edit
+Stara dokumentacja - https://docs.google.com/document/d/1ATEsbiftdQEcgce-aWxOYNcQAnRioykP7WYx5PvhvUk/edit  
 Jamboardy:
 1. https://jamboard.google.com/d/1Gdy-kuHveB5x6WmK6X0u2UBXLGTieq6YyzuTVxKJy1g/viewer?usp=sharing
 2. https://jamboard.google.com/d/1r5wh0uyWfTVD-rnwy8idFrn-nBij1oT1veAJuiA57rU/viewer
