@@ -1,46 +1,81 @@
-## Wykorzystanie adnotacji do oznaczenia klas przeznaczonych do persystencji do utworzenia odpowiednich tabel w bazie.
+<div text-align="center"><h1>Framework realizujący mapowanie OR klas w języku Java</h1></div>
+<p align=center>Piotr Makarewicz, Gabriel Kępka, Adrian Jabłoński, Paweł Hołowicki</p>
 
-1. Odczytujemy z pliku konfiguracyjnego nazwy z klas.
-2. Otwieramy połączenie z bazą danych
-3. Dropujemy wszystkie tabele
-4. Przechodzimy po wszystkich klasach pierwszy raz:
- - tworzymy tabele i kolumny na podstawie klas i atrybutów, na razie bez foreign keys
- - sprawdzamy czy klasa o zadanej nazwie posiada adnotacje “Entity”
- - iterujemy i zapisujemy pola (nazwy typów).
- - SQLBuilder tworzy zapytanie/polecenie sql. (wzorzec builder)
- - Executor dodaje tabele do bazy danych
- - Zapisujemy relacje w zbiorze
-5. Na podstawie zbioru relacji używamy ponownie SQLBuildera do stworzenia relacji
+### 1. Opis biblioteki
+Framework realizuje podstawowe mapowanie obiektowo-relacyjne, pozwala na wykonywanie operacji CRUD na obiektach utrwalając ich stan w bazie danych lub 
+odczytując je z niej, określanie relacji między obiektami różnych klas (One to One, One to Many, Many to Many) oraz obsługę dziedziczenia. 
+Wykorzystuje mechanizm adnotacji, pozwalając oznaczyć jakie klasy mają być persystowane w bazie danych, wartości których pól mają być zapisywane oraz określić relacje między różnymi obiektami.
+Pakiety zawierające klasy modelu dziedzinowego są określone w pliku konfiguracyjnym.
 
-SQLStringBuilder udostępnia metody:
-- createTable(class) // tworzy pustą tabelę
-- addOneToOneRelation(classWithFK, classWithoutFK)
-- addManyToOne(classWithFK, classWithoutFK)
-- addManyToManyRelation(class1, class2)
-- updateTable(object)
+### 2. Użyte technologie  
+- Java
+- MySQL
 
-Jak uniknąć dwukrotnego tworzenia tej samej relacji - trzymamy globalny zbiór wszystkich relacji.
 
-Dodajemy kolumny w SQL przez ALTER TABLE
+### 3. Architektura fizyczna
 
-## Adnotacje, których będziemy używać:
-Klasowe:
-- @Entity
- 
-Pól:
-- @Column
-- @Id
-- @OneToOne(foreignKey = this/other): this - ForeignKey pochodzi z tego obiektu, zapisywany jest w tabeli odpowiadającej drugiemu obiektowi
-- @OneToMany - foreignKey trzymamy w drugiej tabeli
-- @ManyToOne - foreignKey trzymamy w tej tabeli
-- @ManyToMany - tworzymy tabele łącznikową
+<img src="./diagrams/architektura_fizyczna.drawio.png">
 
-## Wzorce:
-- Builder - do tworzenia zapytania SQL
-- Command (?) - do UPDATE, DELETE, INSERT
+Framework umożliwia persystencję na więcej niż jednym serwerze baz danych.
 
-## Problemy do rozwiązania później:
-- Co jeśli pojawi się @Entity w klasie zagnieżdżonej?
-- Reprezentacja relacji One-to-One, One-to-Many, Many-to-Many.
-- Reprezentacja dziedziczenia na trzy sposoby z możliwością wyboru sposobu.
-- Implementacja operacji CRUD na samych obiektach.
+### 4. Architektura logiczna
+
+<img src="./diagrams/architektura_logiczna.drawio.png">
+
+Framework umożliwia persystencję danych w wielu bazach na raz. Z każdą bazą powiązany jest osobny obiekt klasy Session.
+Architektura logiczna zakłada istnienie tylko jednego modelu dziedzinowego w ramach pojedynczej aplikacji korzystającej z naszego frameworka.
+Do tego modelu należą wszystkie klasy z adnotacją @Entity w obrębie aplikacji.
+
+### 5. Diagram modułów biblioteki
+
+### 6. Moduły
+
+### 7. Sposób obsługi dziedziczenia i generowania kluczy głównych
+
+### 8. Zastosowane wzorce projektowe
+
+### 9. Przykłady użycia biblioteki przez klienta
+
+Klasa reprezentująca encję:
+```aidl
+@Entity
+public class Person {
+
+    @Id
+    private Long id;
+
+    @Column
+    private String name;
+
+    public Person() {
+    }
+}
+```
+
+Zapisanie obiektu w bazie:
+```aidl
+SessionFactory sessionFactory = SessionFactory.getInstance();
+Session session = sessionFactory.createSession();
+
+Person person = new Person();
+person.setName(”John”);
+
+session.save(person);
+session.flush();
+session.close();
+```
+
+Załadowanie obiektu z bazy i jego aktualizacja:
+```aidl
+SessionFactory sessionFactory = SessionFactory.getInstance();
+Session session = sessionFactory.createSession();
+
+Person person = session.load(Person.class, 2);
+person.setName(”Json”);
+
+session.update(person);
+session.flush();
+session.close();
+```
+
+### 10. Lista używanych adnotacji
