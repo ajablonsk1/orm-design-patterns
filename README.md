@@ -32,7 +32,7 @@ Do tego modelu należą wszystkie klasy z adnotacją @Entity w obrębie aplikacj
 
 ### 7. Sposób obsługi dziedziczenia i generowania kluczy głównych
 
-Framework obsługuje dziedziczenie za pomocą wzorca projektowego "Class Table Inheritance, gdzie dla każdej klasy z osobna tworzy tabele, w której każdy wiersz odpowiada konkretnym polom w danej klasie. 
+Framework obsługuje dziedziczenie za pomocą wzorca projektowego "Class Table Inheritance", gdzie dla każdej klasy z osobna tworzy tabele, w której każdy wiersz odpowiada konkretnym polom w danej klasie. 
 
 <img src="./diagrams/ClassTableInheritance.png">
 
