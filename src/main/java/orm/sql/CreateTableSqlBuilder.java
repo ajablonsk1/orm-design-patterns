@@ -1,5 +1,6 @@
 package orm.sql;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,7 +19,6 @@ public class CreateTableSqlBuilder extends SqlBuilder {
         this.tables.add(tableName);
         return this;
     }
-
     public CreateTableSqlBuilder column(String columnName, String type){
         this.columns.add(columnName + " " + type);
         return this;
@@ -27,8 +27,9 @@ public class CreateTableSqlBuilder extends SqlBuilder {
     @Override
     public String toString(){
         StringBuilder sql = new StringBuilder("CREATE TABLE ");
-        addStatementToQuery(sql, tables, "", ", ").
-            addStatementToQuery(sql, columns, "(", ", ");
+        columns.add("id INT NOT NULL AUTO_INCREMENT PRIMARY KEY");
+        addStatementToQuery(sql, tables, "", ", ");
+        addStatementToQuery(sql, columns, "(", ", ");
         sql.append(");");
 
         tables.clear();

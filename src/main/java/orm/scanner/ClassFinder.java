@@ -1,7 +1,14 @@
 package orm.scanner;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import orm.annotations.Entity;
 
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -21,6 +28,20 @@ public class ClassFinder {
         this.classLoader = ClassLoader.getSystemClassLoader();
         this.classes = new HashSet<>();
     }
+
+//    public Package[] loadPackagesFromConfig(String filename) {
+//        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//        try {
+//            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+//            DocumentBuilder db = dbf.newDocumentBuilder();
+//            Document doc = db.parse(new File(filename));
+//            doc.getDocumentElement().normalize();
+//            NodeList list = doc.getElementsByTagName("staff");
+//
+//        } catch (ParserConfigurationException | IOException | SAXException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public Set<Class> loadClasses() {
         String[] paths = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
@@ -42,7 +63,7 @@ public class ClassFinder {
             } else {
                 String name = file.getName();
                 if (name.endsWith(".jar")) {
-                    processJarFile(file);
+                    //processJarFile(file);
                 } else if (name.endsWith(".class")) {
                     processClassFile(file);
                 }
@@ -52,6 +73,7 @@ public class ClassFinder {
 
     private void processJarFile(File file) {
         try {
+            System.out.println("Processing jar-file: "+ file.toString());
             JarFile jarFile = new JarFile(file);
             Iterator<JarEntry> iterator = jarFile.entries().asIterator();
 

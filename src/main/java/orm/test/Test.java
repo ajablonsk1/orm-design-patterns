@@ -10,7 +10,7 @@ public class Test {
     int field1;
 
     @Column
-    Object field2;
+    String field2;
 
     Object field3;
 }
