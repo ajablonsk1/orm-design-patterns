@@ -8,29 +8,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class SqlExecutor {
+public class SQLExecutor {
     private final String url;
     private final String user;
     private final String password;
     private final Boolean urlHasCredentials;
 
-
-    public SqlExecutor(String url) {
+    public SQLExecutor(String url) {
         this.url = url;
         this.user = null;
         this.password = null;
         this.urlHasCredentials = false;
     }
 
-    public SqlExecutor(String url, String user, String password) {
+    public SQLExecutor(String url, String user, String password) {
         this.url = url;
-        this.user = user;
-        this.password = password;
-        this.urlHasCredentials = true;
-    }
-
-    public SqlExecutor(String url, String user, String password, String database) {
-        this.url = url.concat("/"+database);
         this.user = user;
         this.password = password;
         this.urlHasCredentials = true;

@@ -1,0 +1,9 @@
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>266</x><y>230</y><w>410</w><h>210</h></coordinates><panel_attributes>SQLExecutor
+--
+-url: String
+-user: String;
+-password: String;
+-urlHasCredentials: boolean;
+--
++executeUnit(List&lt;String&gt;): List&lt;Optional&lt;java.sql.RowSet&gt; &gt;
++execute(java.sql.Connection, String): Optional&lt;java.sql.RowSet&gt;</panel_attributes><additional_attributes></additional_attributes></element></diagram>
