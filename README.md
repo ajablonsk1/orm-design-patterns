@@ -32,6 +32,10 @@ Do tego modelu należą wszystkie klasy z adnotacją @Entity w obrębie aplikacj
 
 ### 7. Sposób obsługi dziedziczenia i generowania kluczy głównych
 
+Framework obsługuje dziedziczenie za pomocą wzorca projektowego "Class Table Inheritance, gdzie dla każdej klasy z osobna tworzy tabele, w której każdy wiersz odpowiada konkretnym polom w danej klasie. 
+
+Każdy obiekt, odpowiadający rekordowi w bazie, posiada własne unikalne id. W bazie istnieje tabela, w której przechowywana jest informacja o następnym wolnym id. Nowy obiekt otrzymuje to id, a następnie wcześniej wspomniana tabela jest aktualizowana.
+
 ### 8. Zastosowane wzorce projektowe
 
 ### 9. Przykłady użycia biblioteki przez klienta
