@@ -36,6 +36,8 @@ Do tego modelu należą wszystkie klasy z adnotacją *@Entity* w obrębie aplika
 
 ## 5. Diagram modułów biblioteki
 
+<img src="./diagrams/modules.png">
+
 ## 6. Moduły
 
 ### 6.1. orm.session
@@ -51,7 +53,7 @@ Klasy:
  - *Executor* - Wykonuje przygotowane wcześniej zapytania SQL
  - *ConnectionPool* - **opis klasy**
 
-### 6.2. orm.scanner
+### 6.2. orm.scheme
 
 ```
 <miejsce na diagram>
@@ -99,7 +101,13 @@ Klasy:
 
 Zaimplementowany w klasie UnitOfWork, agregowanej przez Session. Klasa UnitOfWork utrzymuje trzy zbiory: obiektów do aktualizacji, obiektów do dodania oraz obiektów do usunięcia. Unit of Work pozwoli na optymalizację transakcji przez usunięcie operacji redundantnych i zwiększenie wydajności systemu.
 
-### 7.2. Identity Map
+### 7.2. Identity Field
+
+Każdy obiekt, odpowiadający rekordowi w bazie, posiada własne unikalne id. W bazie istnieje tabela, w której przechowywana jest informacja o następnym wolnym id. Nowy obiekt otrzymuje to id, a następnie wcześniej wspomniana tabela jest aktualizowana.
+
+popraw opis
+
+### 7.3. Identity Map
 
 ```
 <miejsce na diagram klas, które realizują ten wzorzec>
@@ -107,7 +115,7 @@ Zaimplementowany w klasie UnitOfWork, agregowanej przez Session. Klasa UnitOfWor
 
 miejsce na opis
 
-### 7.3. Class Table Inheritance 
+### 7.4. Class Table Inheritance 
 
 ```
 <miejsce na diagram klas, które realizują ten wzorzec>
@@ -117,9 +125,8 @@ Framework obsługuje dziedziczenie za pomocą wzorca projektowego **Class Table 
 
 <img src="./diagrams/ClassTableInheritance.png">
 
-Każdy obiekt, odpowiadający rekordowi w bazie, posiada własne unikalne id. W bazie istnieje tabela, w której przechowywana jest informacja o następnym wolnym id. Nowy obiekt otrzymuje to id, a następnie wcześniej wspomniana tabela jest aktualizowana.
 
-### 7.4. Foreign Key Mapping
+### 7.5. Foreign Key Mapping
 
 ```
 <miejsce na diagram klas, które realizują ten wzorzec>
@@ -129,7 +136,7 @@ Framework obsługuje tworzenie relacji jeden-do-jeden i jeden-do-wielu za pomoc�
 
 miejsce na dalszy opis
 
-### 7.5. Association Table Mapping
+### 7.6. Association Table Mapping
 ```
 <miejsce na diagram klas, które realizują ten wzorzec>
 ```
@@ -138,7 +145,7 @@ Framework obsługuje tworzenie relacji wiele-do-wielu za pomocą wzorca projekto
 
 miejsce na dalszy opis
 
-### 7.6. Factory i Singleton
+### 7.7. Factory i Singleton
 ```
 <miejsce na diagram klas, które realizują ten wzorzec>
 ```
@@ -147,13 +154,13 @@ Zaimplementowane razem w klasie SessionFactory. Służą zapewnieniu globalnej k
 
 miejsce na dalszy opis
 
-### 7.7 Connection Pool
+### 7.8. Connection Pool
 ```
 <miejsce na diagram klas, które realizują ten wzorzec>
 ```
 W SessionFactory
 
-### 7.8. Builder
+### 7.9. Builder
 
 ```
 <miejsce na diagram klas, które realizują ten wzorzec>
