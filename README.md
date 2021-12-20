@@ -16,11 +16,19 @@ Pakiety zawierające klasy modelu dziedzinowego są określone w pliku konfigura
 
 <img src="./diagrams/architektura_fizyczna.drawio.png">
 
+```
+<miejsce na diagram>
+```
+
 Framework umożliwia persystencję na więcej niż jednym serwerze baz danych.
 
 ## 4. Architektura logiczna
 
 <img src="./diagrams/architektura_logiczna.drawio.png">
+
+```
+<miejsce na diagram>
+```
 
 Framework umożliwia persystencję danych w wielu bazach na raz. Z każdą bazą powiązany jest osobny obiekt klasy *Session*.
 Architektura logiczna zakłada istnienie tylko jednego modelu dziedzinowego w ramach pojedynczej aplikacji korzystającej z naszego frameworka.
@@ -38,7 +46,10 @@ Do tego modelu należą wszystkie klasy z adnotacją *@Entity* w obrębie aplika
 
 Klasy:
  - *Session* - **opis klasy**
- - inne klasy...
+ - *SessionFactory* - **opis klasy**
+ - *SchemaCreator* - **opis klasy**
+ - *Executor* - Wykonuje przygotowane wcześniej zapytania SQL
+ - *ConnectionPool* - **opis klasy**
 
 ### 6.2. orm.scanner
 
@@ -47,19 +58,22 @@ Klasy:
 ```
 
 Klasy:
- - *ClassScanner* - **opis klasy**
- - *ClassFinder* - **opis klasy**
- -  inne klasy...
+ - *ClassScanner* - 
+ - *ClassFinder* - Przeszukuje pakiety w poszukiwaniu klas z adnotacją @Entity
 
-### 6.3. orm.sqlbuilder
+### 6.3. orm.sql
 
 ```
 <miejsce na diagram>
 ```
 
 **Klasy:**
- - *SqlBuilder* - **opis klasy**
- - inne klasy...
+ - *QueryBuilder* - **opis klasy**
+ - *Query* - **opis klasy**
+
+**Typy wyliczeniowe:**
+ - *AggregateFunction* - **opis klasy**
+ - *CommandType* - **opis klasy**
 
 ### 6.4. orm.annotations
 
@@ -129,11 +143,17 @@ miejsce na dalszy opis
 <miejsce na diagram klas, które realizują ten wzorzec>
 ```
 
-Zaimplementowane razem w klasie SessionFactory. Służą zapewnieniu globalnej kontroli nad obiektami klasy Session. SessionFactory pilnuje, by nie było więcej niż jednej sesji podłączonej do konkretnej bazy danych. Implementacja Singletona opiera się na *lazy-loading* i podwójnym sprawdzeniu istnienia obiektu w metodzie *getInstance()* w celu zapewnienia bezpieczeństwa w programach wielowątkowych.
+Zaimplementowane razem w klasie SessionFactory. Służą zapewnieniu globalnej kontroli nad obiektami klasy Session. Implementacja Singletona opiera się na *lazy-loading* i podwójnym sprawdzeniu istnienia obiektu w metodzie *getInstance()* w celu zapewnienia bezpieczeństwa w programach wielowątkowych.
 
 miejsce na dalszy opis
 
-### 7.7. Builder
+### 7.7 Connection Pool
+```
+<miejsce na diagram klas, które realizują ten wzorzec>
+```
+W SessionFactory
+
+### 7.8. Builder
 
 ```
 <miejsce na diagram klas, które realizują ten wzorzec>
@@ -141,10 +161,22 @@ miejsce na dalszy opis
 
 Służy ułatwieniu tworzenia różnych typów zapytań SQL.
 
-## 8. Przykłady użycia biblioteki przez klienta
+## 8. Plik konfiguracyjny
+
+Pakiety z klasami, których obiekty są persystowane i wielkość ConnectionPool są zapisane w pliku konfiguracyjnym o formacie JSON. Przykładowy plik:
+
+```json
+{
+    "packages": ["example.package.one", "example.package.two"],
+    "connection_pool_size": 10
+}
+
+```
+
+## 9. Przykłady użycia biblioteki przez klienta
 
 Klasa reprezentująca encję:
-```
+```java
 @Entity
 public class Person {
 
@@ -160,7 +192,7 @@ public class Person {
 ```
 
 Zapisanie obiektu w bazie:
-```
+```java
 SessionFactory sessionFactory = SessionFactory.getInstance();
 Session session = sessionFactory.createSession();
 
@@ -173,7 +205,7 @@ session.close();
 ```
 
 Załadowanie obiektu z bazy i jego aktualizacja:
-```
+```java
 SessionFactory sessionFactory = SessionFactory.getInstance();
 Session session = sessionFactory.createSession();
 
