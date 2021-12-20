@@ -1,0 +1,112 @@
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>870</x><y>100</y><w>240</w><h>120</h></coordinates><panel_attributes>SessionFactory
+--
+-instance : SessionFactory
+-session : ThreadLocal&lt;Session&gt;
+--
++getInstance() : SessionFactory
++createSession() : Session</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>870</x><y>260</y><w>240</w><h>200</h></coordinates><panel_attributes>Session
+--
+-executor : Executor
+-identityMap : Map&lt;Integer, Object&gt;
+-objectsToUpdate : List&lt;Object&gt;
+-objectsToDelete : List&lt;Object&gt;
+-objectsToInsert : List&lt;Object&gt;
+--
++save(Object)
++update(Object)
++delete(Object)
++load(Integer) : Object
++flush()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>430</x><y>100</y><w>250</w><h>150</h></coordinates><panel_attributes>SchemaCreator
+--
+-executor : Executor
+-classScanner : ClassScanner
+-classFinder : ClassFinder
+-queryBuilder : QueryBuilder
+--
++createTables()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1250</x><y>100</y><w>230</w><h>150</h></coordinates><panel_attributes>ConnectionPool
+--
+-size : Integer
+-connections : List&lt;Connection&gt;
+-semaphore : Semaphore
+-lastFree : Integer
+--
++getConnection() : Connection
++releaseConnection()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>840</x><y>520</y><w>310</w><h>170</h></coordinates><panel_attributes>Executor
+--
+-connectionPool : ConnectionPool
+--
++execute(Query) : CachedRowset
++execute(List&lt;Query&gt;) : List&lt;CachedRowset&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1100</x><y>140</y><w>170</w><h>40</h></coordinates><panel_attributes>lt=&lt;.
+&lt;&lt;instatiates&gt;&gt;</panel_attributes><additional_attributes>150;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>980</x><y>210</y><w>100</w><h>70</h></coordinates><panel_attributes>lt=&lt;.
+&lt;&lt;instatiates&gt;&gt;</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1140</x><y>240</y><w>250</w><h>380</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>230;10;230;360;10;360</additional_attributes></element><element><id>Relation</id><coordinates><x>980</x><y>450</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;70;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>540</x><y>240</y><w>320</w><h>380</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>300;360;10;360;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>670</x><y>150</y><w>220</w><h>40</h></coordinates><panel_attributes>lt=&lt;.
+&lt;&lt;instatiates&gt;&gt;</panel_attributes><additional_attributes>10;20;200;20</additional_attributes></element><element><id>UMLPackage</id><coordinates><x>790</x><y>20</y><w>800</w><h>700</h></coordinates><panel_attributes>orm.session
+--
+
+
+fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>90</x><y>320</y><w>310</w><h>170</h></coordinates><panel_attributes>ClassScanner
+--
++getColumns(Class) : List&lt;Field&gt;
++getParentClasses(Class) : List&lt;Class&gt;
++getOneToOneFields(Class) : List&lt;Field&gt;
++getOneToManyFields(Class) : List&lt;Field&gt;
++getManyToOneFields(Class) : List&lt;Field&gt;
++getManyToManyFields(Class) : List&lt;Field&gt;
++getCollectionElementClass(Field) : Class</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>90</x><y>130</y><w>310</w><h>70</h></coordinates><panel_attributes>ClassFinder
+--
++loadClasses() : Set&lt;Class&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>0</x><y>0</y><w>740</w><h>710</h></coordinates><panel_attributes>orm.scheme
+--
+fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>390</x><y>160</y><w>60</w><h>30</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;40;10</additional_attributes></element><element><id>Relation</id><coordinates><x>390</x><y>240</y><w>110</w><h>130</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;110;90;110;90;10</additional_attributes></element><element><id>UMLPackage</id><coordinates><x>140</x><y>750</y><w>370</w><h>340</h></coordinates><panel_attributes>orm.annotations
+--
+fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>160</x><y>800</y><w>100</w><h>30</h></coordinates><panel_attributes>@Entity</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>940</y><w>100</w><h>30</h></coordinates><panel_attributes>@Id</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>160</x><y>870</y><w>100</w><h>30</h></coordinates><panel_attributes>@Column</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>160</x><y>1000</y><w>180</w><h>50</h></coordinates><panel_attributes>@OneToOne
+--
++foreignKey() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>800</y><w>100</w><h>30</h></coordinates><panel_attributes>@OneToMany</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>870</y><w>100</w><h>30</h></coordinates><panel_attributes>@ManyToOne</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>160</x><y>940</y><w>100</w><h>30</h></coordinates><panel_attributes>@ManyToMany</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>330</x><y>480</y><w>30</w><h>310</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;290;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>390</x><y>400</y><w>500</w><h>30</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;480;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>780</x><y>810</y><w>390</w><h>230</h></coordinates><panel_attributes>QueryBuilder
+--
+-query : Query
+--
++setCommandType(CommandType) : QueryBuilder
++addTable(Class) : QueryBuilder
++addColumn(Field) : QueryBuilder
++addCondition(String) : QueryBuilder
++addValue(Object) : QueryBuilder
++setDistinct(Boolean) : QueryBuilder
++groupByColumn(Field) : QueryBuilder
++setAggregate(AggregateFunction, Field) : QueryBuilder
++setColumn(Field, Object) : QueryBuilder
++build() : Query</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1200</x><y>820</y><w>390</w><h>140</h></coordinates><panel_attributes>&lt;&lt;enumeration&gt;&gt;
+AggregateFuntion
+--
+COUNT
+MAX
+MIN
+SUM
+AVG
+--
++toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1210</x><y>1020</y><w>390</w><h>200</h></coordinates><panel_attributes>&lt;&lt;enumeration&gt;&gt;
+CommandType
+--
+DROP
+CREATE
+ALTER
+INSERT
+UPDATE
+DELETE
+SELECT
+--
++toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>790</x><y>1080</y><w>390</w><h>230</h></coordinates><panel_attributes>Query
+--
+-commandType : CommandType
+-tables : List&lt;String&gt;
+-columns : List&lt;String&gt;
+-conditions : :List&lt;String&gt;
+-values : List&lt;Object&gt;
+-groupByColumns : List&lt;String&gt;
+-aggregateFunctions : List&lt;String&gt;
+-setColumns : List&lt;String&gt;
+-isGrouped : Boolean
+-distinct : Boolean
+--
++toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>770</x><y>750</y><w>860</w><h>580</h></coordinates><panel_attributes>orm.sql
+--
+
+
+fg=blue</panel_attributes><additional_attributes></additional_attributes></element></diagram>
