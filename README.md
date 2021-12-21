@@ -126,7 +126,7 @@ Służy zarządzaniu połączeniami z bazą danych, które są wykorzystywane pr
 
 <img src="./diagrams/builder.png" width=40% margin=25px>
 
-Służy ułatwieniu tworzenia różnych typów zapytań SQL. Za pomocą *QueryBuildera* tworzymy zapytanie sql bez podawania paramterów, a na końcu zwracamy obiekt *Query* (QueryObject). Następnie za pomocą funkcji dostępnych w *Query* ustawiamy wartości odpowiednich parametrów i na końcu zwracamy zapytanie SQL w formie Stringa.
+Służy ułatwieniu tworzenia różnych typów zapytań SQL. Za pomocą *QueryBuildera* tworzymy zapytanie SQL bez podawania paramterów, a na końcu zwracamy obiekt *Query* (QueryObject). Następnie za pomocą funkcji dostępnych w *Query* ustawiamy wartości odpowiednich parametrów i na końcu zwracamy zapytanie SQL w formie Stringa.
 
 ## 8. Plik konfiguracyjny
 
