@@ -105,22 +105,11 @@ Framework obsługuje dziedziczenie za pomocą wzorca projektowego **Class Table 
 
 ### 7.5. Foreign Key Mapping
 
-```
-<miejsce na diagram klas, które realizują ten wzorzec>
-```
-
 Framework obsługuje tworzenie relacji jeden-do-jeden i jeden-do-wielu za pomocą wzorca projektowego **Foreign Key Mapping**.
 
-miejsce na dalszy opis
-
 ### 7.6. Association Table Mapping
-```
-<miejsce na diagram klas, które realizują ten wzorzec>
-```
 
 Framework obsługuje tworzenie relacji wiele-do-wielu za pomocą wzorca projektowego **Assotiation Table Mapping**. Tworzy tabelę łącznikową dla każdej pary klas tworzących tę relację.
-
-miejsce na dalszy opis
 
 ### 7.7. Factory i Singleton
 <img src="./diagrams/factory_singleton.png" width=30% margin=25px>
