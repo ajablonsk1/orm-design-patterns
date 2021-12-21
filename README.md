@@ -14,29 +14,19 @@ Pakiety zawierające klasy modelu dziedzinowego są określone w pliku konfigura
 
 ## 3. Architektura fizyczna
 
-<img src="./diagrams/architektura_fizyczna.drawio.png">
+<div text-align="center"><img src="./diagrams/architektura_fizyczna.drawio.png" align="middle"></div>
 
-```
-<miejsce na diagram>
-```
-
-Framework umożliwia persystencję na więcej niż jednym serwerze baz danych.
+Framework umożliwia persystencję danych z jednego komputera na jednej bazie danych.
 
 ## 4. Architektura logiczna
 
-<img src="./diagrams/architektura_logiczna.drawio.png">
+<div text-align="center"><img src="./diagrams/architektura_logiczna.drawio.png" align="middle"></div>
 
-```
-<miejsce na diagram>
-```
-
-Framework umożliwia persystencję danych w wielu bazach na raz. Z każdą bazą powiązany jest osobny obiekt klasy *Session*.
-Architektura logiczna zakłada istnienie tylko jednego modelu dziedzinowego w ramach pojedynczej aplikacji korzystającej z naszego frameworka.
-Do tego modelu należą wszystkie klasy z adnotacją *@Entity* w obrębie aplikacji.
+Framework zakłada istnienie jednego modelu dziedzinowego w aplikacji korzystającej z niego. Do tego modelu należą wszystkie klasy aplikacji, które posiadają adnotację *@Entity*. Jeżeli aplikacja działa wielowątkowo, wówczas każdy wątek tworzy osobny obiekt klasy *Session*. Każdy obiekt z klasy *Session* posiada obiekt klasy *Executor*, który służy do wykonywania poleceń SQL. Na czas wykonania polecenia SQL *Executor* pobiera z *ConnectionPool* połączenie z bazą danych i zwraca je, gdy skończy wykonywać polecenie.
 
 ## 5. Diagram modułów biblioteki
 
-<img src="./diagrams/modules.png">
+<div text-align="center"><img src="./diagrams/modules.png" align="middle"></div>
 
 ## 6. Moduły
 
