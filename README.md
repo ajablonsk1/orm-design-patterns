@@ -14,13 +14,13 @@ Pakiety zawierające klasy modelu dziedzinowego są określone w pliku konfigura
 
 ## 3. Architektura fizyczna
 
-<div text-align="center"><img src="./diagrams/architektura_fizyczna.drawio.png" align="middle"></div>
+<img src="./diagrams/architektura_fizyczna.drawio.png" align="middle" margin=25px>
 
 Framework umożliwia persystencję danych z jednego komputera na jednej bazie danych.
 
 ## 4. Architektura logiczna
 
-<div text-align="center"><img src="./diagrams/architektura_logiczna.drawio.png" align="middle"></div>
+<img src="./diagrams/architektura_logiczna.drawio.png" align="middle" margin=25px>
 
 Framework zakłada istnienie jednego modelu dziedzinowego w aplikacji korzystającej z niego. Do tego modelu należą wszystkie klasy aplikacji, które posiadają adnotację *@Entity*. Jeżeli aplikacja działa wielowątkowo, wówczas każdy wątek tworzy osobny obiekt klasy *Session*. Każdy obiekt z klasy *Session* posiada obiekt klasy *Executor*, który służy do wykonywania poleceń SQL. Na czas wykonania polecenia SQL *Executor* pobiera z *ConnectionPool* połączenie z bazą danych i zwraca je, gdy skończy wykonywać polecenie.
 
@@ -35,43 +35,49 @@ Framework zakłada istnienie jednego modelu dziedzinowego w aplikacji korzystaj�
 <img src="./diagrams/session_module.png" align="middle" width=66% margin=25px>
 
 Klasy:
- - *Session* - **opis klasy**
- - *SessionFactory* - **opis klasy**
- - *SchemaCreator* - **opis klasy**
- - *Executor* - Wykonuje przygotowane wcześniej zapytania SQL
- - *ConnectionPool* - **opis klasy**
+ - *Session* - Główna klasa frameworku. Posiada listy obiektów do dodania do bazy danych, modyfikacji i usunięcia, realizując w ten sposób wzorzec **Unit of Work**. Oprócz tego zawiera mapę *identityMap*, w której kluczami są identyfikatory, a wartościami obiekty załadowane z bazy danych, zgodnie z wzorcem **Identity Map**. Metody klasy *Session* są wywoływane przez aplikację korzystającą z frameworka:
+   - *flush()* - zatwierdza zmiany; sprawia, że dla obiektów na listach Unit of Work są wykonywane odpowiednie czynności. Tworzy z pomocą *QueryBuilder* obiekt zapytania *Query*, który następnie przekazuje do obiektu *executor*
+   - *save()* - dodaje obiekt do listy *objectsToInsert*
+   - *update()* - dodaje obiekt do listy *objectsToUpdate*
+   - *delete()* - dodaje obiekt do listy *objectsToDelete*
+   - *load()* - pobiera obiekt z bazy danych lub z *identityMap*
+ - *SessionFactory* - odpowiada za tworzenie obiektów klasy *Session*, realizując w ten sposób wzorzec **Factory**. Zapewnia, że jeden wątek może mieć tylko jeden obiekt klasy *Session*, zapisując referencję na ten obiekt w zmiennej typu *ThreadLocal\<Session\>*. W aplikacji może istnieć tylko jeden obiekt *SessionFactory*, jest więc tu wykorzystany wzorzec **Singleton**. Pierwsze wywołanie metody *getInstance()* sprawia że SessionFactory uruchamia metodę *createTables()* klasy *SchemaCreator* i inicjalizuje pulę połączeń w klasie *ConnectionPool*.
+ - *Executor* - Wykonuje przygotowane wcześniej zapytania SQL. W każdym wywołaniu metody *execute()* pobiera z *ConnectionPool* wolne połączenie, wykonuje zapytania, zatwierdza transakcję i zwraca połączenie do *ConnectionPool*.
+ - *ConnectionPool* - Przechowuje i udostępnia pulę połączeń z bazą danych. Liczebność puli jest specyfikowana w pliku konfiguracyjnym. W celu zarządzania dostępem do puli w programach wielowątkowych stosuje semafor licznikowy. Realizuje wzorzec projektowy **Connection Pool**.
 
 ### 6.2. orm.schema
 
 <img src="./diagrams/schema_module.png" align="middle" width=40% margin=25px>
 
-Klasy:
- - *ClassScanner* - 
- - *ClassFinder* - Przeszukuje pakiety w poszukiwaniu klas z adnotacją @Entity
+**Klasy:**
+ - *SchemaCreator* - Dla klas podanych w pliku konfiguracyjnym tworzy odpowiednie tabele w bazie danych
+ - *ClassScanner* - Wykonuje refleksję na klasach i zwraca pola z odpowiednimi adnotacjami
+ - *ClassFinder* - Przeszukuje pakiety w poszukiwaniu klas z adnotacją *@Entity*
 
 ### 6.3. orm.sql
 
 <img src="./diagrams/sql_module.png" align="middle" width=66% margin=25px>
 
 **Klasy:**
- - *QueryBuilder* - **opis klasy**
- - *Query* - **opis klasy**
+ - *QueryBuilder* - udostępnia metody pomagające tworzyć obiekt *Query*, realizując w ten sposób wzorzec **Builder**
+ - *Query* - przechowuje elementy zapytania SQL, umożliwia stworzenie kodu SQL na podstawie tych elementów
 
 **Typy wyliczeniowe:**
- - *AggregateFunction* - **opis klasy**
- - *CommandType* - **opis klasy**
+ - *AggregateFunction* - reprezentuje funkcję agregującą w zapytaniu SQL
+ - *CommandType* - reprezentuje typ zapytania SQL
 
 ### 6.4. orm.annotations
 
 <img src="./diagrams/annotations_module.png" align="middle" width=30% margin=25px>
 
 **Adnotacje:**
- - *@Entity* - z opisami!
- - *@Column*
- - *@OneToOne*(foreignKey="this"/"other")
- - *@OneToMany*
- - *@ManyToOne*
- - *@ManyToMany*
+ - *@Entity* - adnotacja klasy repezentującej encję, dla każdej z tak oznaczonych klas *SchemaCreator* tworzy osobną tabelę w bazie danych
+ - *@Id* - adnotacja pola reprezentującego klucz główny rekordu w bazie danych, zgodnie z wzorcem **Identity Field**. Klucz ten jest unikalny nie tylko w skali tabeli, ale w skali całej bazy danych.
+ - *@Column* - adnotacja pola reprezentującego kolumnę w bazie danych.
+ - *@OneToOne* - adnotacja pola z referencją na obiekt, z którym obecny obiekt jest w relacji jeden-do-jeden. Argument *foreignKey* o możliwych wartościach `"this"` lub `"other"` decyduje, czy klucz obcy zostanie umieszczony w tabeli tego obiektu lub drugiego obiektu w relacji.
+ - *@OneToMany* - adnotacja pola z referencją na obiekt, z którym obecny obiekt jest w relacji jeden-do-wiele.
+ - *@ManyToOne* - adnotacja pola z referencją na obiekt, z którym obecny obiekt jest w relacji wiele-do-jednego.
+ - *@ManyToMany* - adnotacja pola z referencją na obiekt, z którym obecny obiekt jest w relacji wiele-do-wiele.
 
 ## 7. Zastosowane wzorce projektowe
 
@@ -81,13 +87,11 @@ Klasy:
 <miejsce na diagram klas, które realizują ten wzorzec>
 ```
 
-Zaimplementowany w klasie UnitOfWork, agregowanej przez Session. Klasa UnitOfWork utrzymuje trzy zbiory: obiektów do aktualizacji, obiektów do dodania oraz obiektów do usunięcia. Unit of Work pozwoli na optymalizację transakcji przez usunięcie operacji redundantnych i zwiększenie wydajności systemu.
+Klasa *Session* utrzymuje trzy zbiory: obiektów do aktualizacji, obiektów do dodania oraz obiektów do usunięcia. Unit of Work pozwoli na optymalizację transakcji przez usunięcie operacji redundantnych i zwiększenie wydajności systemu.
 
 ### 7.2. Identity Field
 
 Każdy obiekt, odpowiadający rekordowi w bazie, posiada własne unikalne id. W bazie istnieje tabela, w której przechowywana jest informacja o następnym wolnym id. Nowy obiekt otrzymuje to id, a następnie wcześniej wspomniana tabela jest aktualizowana.
-
-popraw opis
 
 ### 7.3. Identity Map
 
@@ -99,14 +103,9 @@ miejsce na opis
 
 ### 7.4. Class Table Inheritance 
 
-```
-<miejsce na diagram klas, które realizują ten wzorzec>
-```
-
-Framework obsługuje dziedziczenie za pomocą wzorca projektowego **Class Table Inheritance**, gdzie dla każdej klasy z osobna tworzy tabele, w której każdy wiersz odpowiada konkretnym polom w danej klasie. 
-
 <img src="./diagrams/ClassTableInheritance.png">
 
+Framework obsługuje dziedziczenie za pomocą wzorca projektowego **Class Table Inheritance**, gdzie dla każdej klasy z osobna tworzy tabele, w której każdy wiersz odpowiada konkretnym polom w danej klasie. 
 
 ### 7.5. Foreign Key Mapping
 
