@@ -1,10 +1,10 @@
-<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>870</x><y>100</y><w>240</w><h>120</h></coordinates><panel_attributes>SessionFactory
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>571</x><y>80</y><w>240</w><h>120</h></coordinates><panel_attributes>SessionFactory
 --
 -instance : SessionFactory
 -session : ThreadLocal&lt;Session&gt;
 --
 +getInstance() : SessionFactory
-+createSession() : Session</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>870</x><y>260</y><w>240</w><h>200</h></coordinates><panel_attributes>Session
++createSession() : Session</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>571</x><y>240</y><w>240</w><h>200</h></coordinates><panel_attributes>Session
 --
 -executor : Executor
 -identityMap : Map&lt;Integer, Object&gt;
@@ -16,14 +16,14 @@
 +update(Object)
 +delete(Object)
 +load(Integer) : Object
-+flush()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>430</x><y>100</y><w>250</w><h>150</h></coordinates><panel_attributes>SchemaCreator
++flush()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>111</x><y>150</y><w>250</w><h>150</h></coordinates><panel_attributes>SchemaCreator
 --
 -executor : Executor
 -classScanner : ClassScanner
 -classFinder : ClassFinder
 -queryBuilder : QueryBuilder
 --
-+createTables()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1250</x><y>100</y><w>230</w><h>150</h></coordinates><panel_attributes>ConnectionPool
++createTables()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>911</x><y>80</y><w>230</w><h>150</h></coordinates><panel_attributes>ConnectionPool
 --
 -size : Integer
 -connections : List&lt;Connection&gt;
@@ -31,19 +31,19 @@
 -lastFree : Integer
 --
 +getConnection() : Connection
-+releaseConnection()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>840</x><y>520</y><w>310</w><h>170</h></coordinates><panel_attributes>Executor
++releaseConnection()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>541</x><y>500</y><w>310</w><h>170</h></coordinates><panel_attributes>Executor
 --
 -connectionPool : ConnectionPool
 --
 +execute(Query) : CachedRowset
-+execute(List&lt;Query&gt;) : List&lt;CachedRowset&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1100</x><y>140</y><w>170</w><h>40</h></coordinates><panel_attributes>lt=&lt;.
-&lt;&lt;instatiates&gt;&gt;</panel_attributes><additional_attributes>150;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>980</x><y>210</y><w>100</w><h>70</h></coordinates><panel_attributes>lt=&lt;.
-&lt;&lt;instatiates&gt;&gt;</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1140</x><y>240</y><w>250</w><h>380</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>230;10;230;360;10;360</additional_attributes></element><element><id>Relation</id><coordinates><x>980</x><y>450</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;70;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>540</x><y>240</y><w>320</w><h>380</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>300;360;10;360;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>670</x><y>150</y><w>220</w><h>40</h></coordinates><panel_attributes>lt=&lt;.
-&lt;&lt;instatiates&gt;&gt;</panel_attributes><additional_attributes>10;20;200;20</additional_attributes></element><element><id>UMLPackage</id><coordinates><x>790</x><y>20</y><w>800</w><h>700</h></coordinates><panel_attributes>orm.session
++execute(List&lt;Query&gt;) : List&lt;CachedRowset&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>801</x><y>120</y><w>130</w><h>40</h></coordinates><panel_attributes>lt=&lt;.
+&lt;&lt;instatiates&gt;&gt;</panel_attributes><additional_attributes>110;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>681</x><y>190</y><w>100</w><h>70</h></coordinates><panel_attributes>lt=&lt;.
+&lt;&lt;instatiates&gt;&gt;</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>841</x><y>220</y><w>210</w><h>380</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>190;10;190;360;10;360</additional_attributes></element><element><id>Relation</id><coordinates><x>681</x><y>430</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;70;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>351</x><y>250</y><w>210</w><h>350</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>190;330;160;330;160;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>351</x><y>170</y><w>240</w><h>40</h></coordinates><panel_attributes>lt=&lt;.
+&lt;&lt;instatiates&gt;&gt;</panel_attributes><additional_attributes>10;20;220;20</additional_attributes></element><element><id>UMLPackage</id><coordinates><x>531</x><y>0</y><w>650</w><h>690</h></coordinates><panel_attributes>orm.session
 --
 
 
-fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>90</x><y>320</y><w>310</w><h>170</h></coordinates><panel_attributes>ClassScanner
+fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>111</x><y>320</y><w>310</w><h>170</h></coordinates><panel_attributes>ClassScanner
 --
 +getColumns(Class) : List&lt;Field&gt;
 +getParentClasses(Class) : List&lt;Class&gt;
@@ -51,15 +51,13 @@ fg=blue</panel_attributes><additional_attributes></additional_attributes></eleme
 +getOneToManyFields(Class) : List&lt;Field&gt;
 +getManyToOneFields(Class) : List&lt;Field&gt;
 +getManyToManyFields(Class) : List&lt;Field&gt;
-+getCollectionElementClass(Field) : Class</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>90</x><y>130</y><w>310</w><h>70</h></coordinates><panel_attributes>ClassFinder
++getCollectionElementClass(Field) : Class</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>91</x><y>0</y><w>380</w><h>510</h></coordinates><panel_attributes>orm.scheme
 --
-+loadClasses() : Set&lt;Class&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>0</x><y>0</y><w>740</w><h>710</h></coordinates><panel_attributes>orm.scheme
+fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>91</x><y>530</y><w>320</w><h>300</h></coordinates><panel_attributes>orm.annotations
 --
-fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>390</x><y>160</y><w>60</w><h>30</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;40;10</additional_attributes></element><element><id>Relation</id><coordinates><x>390</x><y>240</y><w>110</w><h>130</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;110;90;110;90;10</additional_attributes></element><element><id>UMLPackage</id><coordinates><x>140</x><y>750</y><w>370</w><h>340</h></coordinates><panel_attributes>orm.annotations
+fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>121</x><y>610</y><w>100</w><h>30</h></coordinates><panel_attributes>@Entity</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>291</x><y>610</y><w>100</w><h>30</h></coordinates><panel_attributes>@Id</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>121</x><y>660</y><w>100</w><h>30</h></coordinates><panel_attributes>@Column</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>121</x><y>760</y><w>180</w><h>50</h></coordinates><panel_attributes>@OneToOne
 --
-fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>160</x><y>800</y><w>100</w><h>30</h></coordinates><panel_attributes>@Entity</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>940</y><w>100</w><h>30</h></coordinates><panel_attributes>@Id</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>160</x><y>870</y><w>100</w><h>30</h></coordinates><panel_attributes>@Column</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>160</x><y>1000</y><w>180</w><h>50</h></coordinates><panel_attributes>@OneToOne
---
-+foreignKey() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>800</y><w>100</w><h>30</h></coordinates><panel_attributes>@OneToMany</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>870</y><w>100</w><h>30</h></coordinates><panel_attributes>@ManyToOne</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>160</x><y>940</y><w>100</w><h>30</h></coordinates><panel_attributes>@ManyToMany</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>330</x><y>480</y><w>30</w><h>310</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;290;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>390</x><y>400</y><w>500</w><h>30</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;480;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>780</x><y>810</y><w>390</w><h>230</h></coordinates><panel_attributes>QueryBuilder
++foreignKey() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>291</x><y>660</y><w>100</w><h>30</h></coordinates><panel_attributes>@OneToMany</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>291</x><y>710</y><w>100</w><h>30</h></coordinates><panel_attributes>@ManyToOne</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>121</x><y>710</y><w>100</w><h>30</h></coordinates><panel_attributes>@ManyToMany</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>231</x><y>480</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;70;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>481</x><y>790</y><w>430</w><h>230</h></coordinates><panel_attributes>QueryBuilder
 --
 -query : Query
 --
@@ -72,7 +70,7 @@ fg=blue</panel_attributes><additional_attributes></additional_attributes></eleme
 +groupByColumn(Field) : QueryBuilder
 +setAggregate(AggregateFunction, Field) : QueryBuilder
 +setColumn(Field, Object) : QueryBuilder
-+build() : Query</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1200</x><y>820</y><w>390</w><h>140</h></coordinates><panel_attributes>&lt;&lt;enumeration&gt;&gt;
++build() : Query</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>941</x><y>800</y><w>220</w><h>140</h></coordinates><panel_attributes>&lt;&lt;enumeration&gt;&gt;
 AggregateFuntion
 --
 COUNT
@@ -81,7 +79,7 @@ MIN
 SUM
 AVG
 --
-+toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1210</x><y>1020</y><w>390</w><h>200</h></coordinates><panel_attributes>&lt;&lt;enumeration&gt;&gt;
++toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>961</x><y>1000</y><w>200</w><h>200</h></coordinates><panel_attributes>&lt;&lt;enumeration&gt;&gt;
 CommandType
 --
 DROP
@@ -92,7 +90,7 @@ UPDATE
 DELETE
 SELECT
 --
-+toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>790</x><y>1080</y><w>390</w><h>230</h></coordinates><panel_attributes>Query
++toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>491</x><y>1060</y><w>390</w><h>230</h></coordinates><panel_attributes>Query
 --
 -commandType : CommandType
 -tables : List&lt;String&gt;
@@ -105,8 +103,10 @@ SELECT
 -isGrouped : Boolean
 -distinct : Boolean
 --
-+toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>770</x><y>750</y><w>860</w><h>580</h></coordinates><panel_attributes>orm.sql
++toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>441</x><y>740</y><w>740</w><h>580</h></coordinates><panel_attributes>orm.sql
 --
 
 
-fg=blue</panel_attributes><additional_attributes></additional_attributes></element></diagram>
+fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>691</x><y>662</y><w>30</w><h>150</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;130;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>901</x><y>842</y><w>60</w><h>30</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>40;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>901</x><y>952</y><w>180</w><h>70</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>160;50;160;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>101</x><y>50</y><w>310</w><h>70</h></coordinates><panel_attributes>ClassFinder
+--
++loadClasses() : Set&lt;Class&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>351</x><y>250</y><w>180</w><h>560</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>160;540;160;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>691</x><y>1012</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>350</x><y>250</y><w>50</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>30;70;30;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>350</x><y>110</y><w>70</w><h>170</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>50;10;50;150;10;150</additional_attributes></element><element><id>Relation</id><coordinates><x>800</x><y>370</y><w>90</w><h>440</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>70;420;70;10;10;10</additional_attributes></element></diagram>
