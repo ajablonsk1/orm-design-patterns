@@ -83,9 +83,7 @@ Klasy:
 
 ### 7.1. Unit of Work
 
-```
-<miejsce na diagram klas, które realizują ten wzorzec>
-```
+<img src="./diagrams/unit_of_work.png" width=30% margin=25px>
 
 Klasa *Session* utrzymuje trzy zbiory: obiektów do aktualizacji, obiektów do dodania oraz obiektów do usunięcia. Unit of Work pozwoli na optymalizację transakcji przez usunięcie operacji redundantnych i zwiększenie wydajności systemu.
 
@@ -95,11 +93,9 @@ Każdy obiekt, odpowiadający rekordowi w bazie, posiada własne unikalne id. W 
 
 ### 7.3. Identity Map
 
-```
-<miejsce na diagram klas, które realizują ten wzorzec>
-```
+<img src="./diagrams/identity_map.png" width=30% margin=25px>
 
-miejsce na opis
+Gwarantuje istnienie tylko jednego obiektu odpowiadającemu danemu rekordowi w bazie danych. Gdy wywołana zostaje metoda *load()*, zanim obiekt zostaje załadowany, sprawdzane jest jego istnienie w *identityMap*.
 
 ### 7.4. Class Table Inheritance 
 
@@ -127,25 +123,19 @@ Framework obsługuje tworzenie relacji wiele-do-wielu za pomocą wzorca projekto
 miejsce na dalszy opis
 
 ### 7.7. Factory i Singleton
-```
-<miejsce na diagram klas, które realizują ten wzorzec>
-```
+<img src="./diagrams/factory_singleton.png" width=30% margin=25px>
 
 Zaimplementowane razem w klasie SessionFactory. Służą zapewnieniu globalnej kontroli nad obiektami klasy Session. Implementacja Singletona opiera się na *lazy-loading* i podwójnym sprawdzeniu istnienia obiektu w metodzie *getInstance()* w celu zapewnienia bezpieczeństwa w programach wielowątkowych.
 
-miejsce na dalszy opis
-
 ### 7.8. Connection Pool
-```
-<miejsce na diagram klas, które realizują ten wzorzec>
-```
-W SessionFactory
+
+<img src="./diagrams/connection_pool.png" width=30% margin=25px>
+
+Służy zarządzaniu połączeniami z bazą danych, które są wykorzystywane przez obiekty klasy *Executor*. Używa semafora, by w sytuacji gdy nie ma dostępnych połączeń, wątek zaczekał na nie po wywołaniu metody *getConnection()*.
 
 ### 7.9. Builder
 
-```
-<miejsce na diagram klas, które realizują ten wzorzec>
-```
+<img src="./diagrams/builder.png" width=40% margin=25px>
 
 Służy ułatwieniu tworzenia różnych typów zapytań SQL.
 
