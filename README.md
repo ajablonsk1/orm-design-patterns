@@ -26,15 +26,13 @@ Framework zakłada istnienie jednego modelu dziedzinowego w aplikacji korzystaj�
 
 ## 5. Diagram modułów biblioteki
 
-<div text-align="center"><img src="./diagrams/modules.png" align="middle"></div>
+<div text-align="center" width=66%><img src="./diagrams/modules.png" align="middle"></div>
 
 ## 6. Moduły
 
 ### 6.1. orm.session
 
-```
-<miejsce na diagram>
-```
+<img src="./diagrams/session_module.png" align="middle" width=66% margin=25px>
 
 Klasy:
  - *Session* - **opis klasy**
@@ -43,11 +41,9 @@ Klasy:
  - *Executor* - Wykonuje przygotowane wcześniej zapytania SQL
  - *ConnectionPool* - **opis klasy**
 
-### 6.2. orm.scheme
+### 6.2. orm.schema
 
-```
-<miejsce na diagram>
-```
+<img src="./diagrams/schema_module.png" align="middle" width=40% margin=25px>
 
 Klasy:
  - *ClassScanner* - 
@@ -55,9 +51,7 @@ Klasy:
 
 ### 6.3. orm.sql
 
-```
-<miejsce na diagram>
-```
+<img src="./diagrams/sql_module.png" align="middle" width=66% margin=25px>
 
 **Klasy:**
  - *QueryBuilder* - **opis klasy**
@@ -69,9 +63,7 @@ Klasy:
 
 ### 6.4. orm.annotations
 
-```
-<miejsce na diagram>
-```
+<img src="./diagrams/annotations_module.png" align="middle" width=30% margin=25px>
 
 **Adnotacje:**
  - *@Entity* - z opisami!
