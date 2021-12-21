@@ -51,7 +51,7 @@ fg=blue</panel_attributes><additional_attributes></additional_attributes></eleme
 +getOneToManyFields(Class) : List&lt;Field&gt;
 +getManyToOneFields(Class) : List&lt;Field&gt;
 +getManyToManyFields(Class) : List&lt;Field&gt;
-+getCollectionElementClass(Field) : Class</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>91</x><y>0</y><w>380</w><h>510</h></coordinates><panel_attributes>orm.scheme
++getCollectionElementClass(Field) : Class</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>91</x><y>0</y><w>380</w><h>510</h></coordinates><panel_attributes>orm.schema
 --
 fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>91</x><y>530</y><w>320</w><h>300</h></coordinates><panel_attributes>orm.annotations
 --
