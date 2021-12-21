@@ -1,0 +1,51 @@
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>60</x><y>430</y><w>430</w><h>230</h></coordinates><panel_attributes>QueryBuilder
+--
+-query : Query
+--
++setCommandType(CommandType) : QueryBuilder
++addTable(Class) : QueryBuilder
++addColumn(Field) : QueryBuilder
++addCondition(String) : QueryBuilder
++addValue(Object) : QueryBuilder
++setDistinct(Boolean) : QueryBuilder
++groupByColumn(Field) : QueryBuilder
++setAggregate(AggregateFunction, Field) : QueryBuilder
++setColumn(Field, Object) : QueryBuilder
++build() : Query</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>520</x><y>440</y><w>220</w><h>140</h></coordinates><panel_attributes>&lt;&lt;enumeration&gt;&gt;
+AggregateFuntion
+--
+COUNT
+MAX
+MIN
+SUM
+AVG
+--
++toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>540</x><y>640</y><w>200</w><h>200</h></coordinates><panel_attributes>&lt;&lt;enumeration&gt;&gt;
+CommandType
+--
+DROP
+CREATE
+ALTER
+INSERT
+UPDATE
+DELETE
+SELECT
+--
++toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>70</x><y>700</y><w>390</w><h>230</h></coordinates><panel_attributes>Query
+--
+-commandType : CommandType
+-tables : List&lt;String&gt;
+-columns : List&lt;String&gt;
+-conditions : :List&lt;String&gt;
+-values : List&lt;Object&gt;
+-groupByColumns : List&lt;String&gt;
+-aggregateFunctions : List&lt;String&gt;
+-setColumns : List&lt;String&gt;
+-isGrouped : Boolean
+-distinct : Boolean
+--
++toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>270</x><y>652</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>480</x><y>592</y><w>180</w><h>70</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>160;50;160;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>480</x><y>482</y><w>60</w><h>30</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>40;10;10;10</additional_attributes></element><element><id>UMLPackage</id><coordinates><x>40</x><y>390</y><w>740</w><h>580</h></coordinates><panel_attributes>orm.sql
+--
+
+
+fg=blue</panel_attributes><additional_attributes></additional_attributes></element></diagram>

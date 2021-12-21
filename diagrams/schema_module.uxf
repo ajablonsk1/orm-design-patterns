@@ -1,0 +1,20 @@
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>30</x><y>330</y><w>310</w><h>170</h></coordinates><panel_attributes>ClassScanner
+--
++getColumns(Class) : List&lt;Field&gt;
++getParentClasses(Class) : List&lt;Class&gt;
++getOneToOneFields(Class) : List&lt;Field&gt;
++getOneToManyFields(Class) : List&lt;Field&gt;
++getManyToOneFields(Class) : List&lt;Field&gt;
++getManyToManyFields(Class) : List&lt;Field&gt;
++getCollectionElementClass(Field) : Class</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>30</x><y>160</y><w>250</w><h>150</h></coordinates><panel_attributes>SchemaCreator
+--
+-executor : Executor
+-classScanner : ClassScanner
+-classFinder : ClassFinder
+-queryBuilder : QueryBuilder
+--
++createTables()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>10</x><y>10</y><w>380</w><h>510</h></coordinates><panel_attributes>orm.schema
+--
+fg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>269</x><y>260</y><w>50</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>30;70;30;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>20</x><y>60</y><w>310</w><h>70</h></coordinates><panel_attributes>ClassFinder
+--
++loadClasses() : Set&lt;Class&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>269</x><y>120</y><w>70</w><h>170</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>50;10;50;150;10;150</additional_attributes></element></diagram>
