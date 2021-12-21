@@ -1,82 +1,27 @@
-<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>346</x><y>0</y><w>210</w><h>70</h></coordinates><panel_attributes>/SqlBuilder/
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>60</x><y>430</y><w>430</w><h>230</h></coordinates><panel_attributes>QueryBuilder
 --
+-query : Query
 --
-+addStatementToQuery: SqlBuilder</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>16</x><y>120</y><w>260</w><h>130</h></coordinates><panel_attributes>CreateTableSqlBuilder
++setCommandType(CommandType) : QueryBuilder
++addTable(Class) : QueryBuilder
++addColumn(Field) : QueryBuilder
++addCondition(String) : QueryBuilder
++addValue(Object) : QueryBuilder
++setDistinct(Boolean) : QueryBuilder
++groupByColumn(Field) : QueryBuilder
++setAggregate(AggregateFunction, Field) : QueryBuilder
++setColumn(Field, Object) : QueryBuilder
++build() : Query</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>70</x><y>700</y><w>390</w><h>230</h></coordinates><panel_attributes>Query
 --
--tables: List&lt;String&gt;
--columns: List&lt;String&gt;
+-commandType : CommandType
+-tables : List&lt;String&gt;
+-columns : List&lt;String&gt;
+-conditions : :List&lt;String&gt;
+-values : List&lt;Object&gt;
+-groupByColumns : List&lt;String&gt;
+-aggregateFunctions : List&lt;String&gt;
+-setColumns : List&lt;String&gt;
+-isGrouped : Boolean
+-distinct : Boolean
 --
-+CreateTableSqlBuilder()
-+toString(): String
-+table(String): CreateTableSqlBuilder
-+column(String, String): CreateTableSqlBuilder</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>16</x><y>280</y><w>260</w><h>170</h></coordinates><panel_attributes>UpdateRecordsSqlBuilder
---
--tables: List&lt;String&gt;
--sets: List&lt;String&gt;
--wheres: List&lt;String&gt;
---
-+UpdateRecordsSqlBuilder()
-+toString(): String
-+and(String): UpdateRecordsSqlBuilder
-+set(String, String): UpdateRecordsSqlBuilder
-+table(String): UpdateRecordsSqlBuilder
-+where(String): UpdateRecordsSqlBuilder</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>316</x><y>200</y><w>260</w><h>470</h></coordinates><panel_attributes>SelectRecordsSqlBuilder
---
--columns: List&lt;String&gt;
--tables: List&lt;String&gt;
--wheres: List&lt;String&gt;
--groupBys: List&lt;String&gt;
--orderBys: List&lt;String&gt;
--joins: List&lt;String&gt;
--leftJoins: List&lt;String&gt;
--havings: List&lt;String&gt;
--distinct: boolean
--limit: int
--offset: int
---
-+SelectRecordsSqlBuilder()
-+toString(): String
-+andForHaving(String): SelectRecordsSqlBuilder
-+andForWhere(String): SelectRecordsSqlBuilder
-+avg(String): SelectRecordsSqlBuilder
-+column(String): SelectRecordsSqlBuilder
-+count(String): SelectRecordsSqlBuilder
-+distinct(): SelectRecordsSqlBuilder
-+groupBy(String): SelectRecordsSqlBuilder
-+having(String): SelectRecordsSqlBuilder
-+join(String): SelectRecordsSqlBuilder
-+leftJoin(String): SelectRecordsSqlBuilder
-+max(String): SelectRecordsSqlBuilder
-+min(String): SelectRecordsSqlBuilder
-+orderBy(String): SelectRecordsSqlBuilder
-+sum(String): SelectRecordsSqlBuilder
-+table(String): SelectRecordsSqlBuilder
-+where(String): SelectRecordsSqlBuilder
-
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>626</x><y>310</y><w>260</w><h>90</h></coordinates><panel_attributes>DropTableSqlBuilder
---
--tables: List&lt;String&gt;
---
-+DropTableSqlBuilder()
-+toString(): String
-+table(String): DropTableSqlBuilder
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>626</x><y>120</y><w>260</w><h>130</h></coordinates><panel_attributes>InsertRecordsSqlBuilder
---
--tables: List&lt;String&gt;
--values: List&lt;String&gt;
---
-+InsertRecordsSqlBuilder()
-+toString(): String
-+table(String): InsertRecordsSqlBuilder
-+values(String): InsertRecordsSqlBuilder
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>626</x><y>440</y><w>260</w><h>140</h></coordinates><panel_attributes>DeleteRecordsSqlBuilder
---
--tables: List&lt;String&gt;
--wheres: List&lt;String&gt;
---
-+DeleteRecordsSqlBuilder()
-+toString(): String
-+and(String): DeleteRecordsSqlBuilder
-+table(String): DeleteRecordsSqlBuilder
-+where(String): DeleteRecordsSqlBuilder
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>140</x><y>60</y><w>230</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>210;10;10;60</additional_attributes></element><element><id>Relation</id><coordinates><x>260</x><y>60</y><w>110</w><h>240</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>90;10;10;220</additional_attributes></element><element><id>Relation</id><coordinates><x>540</x><y>60</y><w>240</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;220;60</additional_attributes></element><element><id>Relation</id><coordinates><x>540</x><y>60</y><w>110</w><h>270</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;90;250</additional_attributes></element><element><id>Relation</id><coordinates><x>440</x><y>60</y><w>30</w><h>160</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;140</additional_attributes></element><element><id>Relation</id><coordinates><x>540</x><y>60</y><w>110</w><h>400</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;90;380</additional_attributes></element></diagram>
++toString() : String</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>270</x><y>652</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element></diagram>

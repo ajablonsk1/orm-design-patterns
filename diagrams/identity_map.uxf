@@ -1,10 +1,10 @@
 <diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>10</x><y>10</y><w>240</w><h>200</h></coordinates><panel_attributes>Session
 --
 -executor : Executor
--identityMap : Map&lt;Integer, Object&gt;
-**-objectsToUpdate : List&lt;Object&gt;**
-**-objectsToDelete : List&lt;Object&gt;**
-**-objectsToInsert : List&lt;Object&gt;**
+**-identityMap : Map&lt;Integer, Object&gt;**
+-objectsToUpdate : List&lt;Object&gt;
+-objectsToDelete : List&lt;Object&gt;
+-objectsToInsert : List&lt;Object&gt;
 --
 +save(Object)
 +update(Object)
