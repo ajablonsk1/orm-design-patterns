@@ -3,6 +3,7 @@ package orm.scanner;
 import orm.annotations.*;
 import orm.executor.SqlExecutor;
 import orm.sql.CommandType;
+import orm.sql.Query;
 import orm.sql.QueryBuilder;
 
 import java.lang.annotation.Annotation;
@@ -31,9 +32,9 @@ public class ClassScanner {
         for (Annotation annotation : classAnnotations) {
             if (annotation.annotationType() == Entity.class) {
                 QueryBuilder queryBuilder = new QueryBuilder();
-                String query = queryBuilder.setCommandType(CommandType.CREATE)
+                Query query = queryBuilder.setCommandType(CommandType.CREATE)
                         .addTable(currentClass)
-                        .toString();
+                        .build();
                 executor.execute(query);
             }
             // TODO: pozostałe adnotacje, jeżeli będą
@@ -48,10 +49,10 @@ public class ClassScanner {
                 if (annotationType == Column.class) {
                     // TODO: Dodanie kolumn z klas nadrzędnych
                     QueryBuilder queryBuilder = new QueryBuilder();
-                    String query = queryBuilder.setCommandType(CommandType.ALTER)
+                    Query query = queryBuilder.setCommandType(CommandType.ALTER)
                             .addTable(currentClass)
                             .addColumn(field)
-                            .toString();
+                            .build();
                     executor.execute(query);
                 } else if (annotationType == Id.class) {
 

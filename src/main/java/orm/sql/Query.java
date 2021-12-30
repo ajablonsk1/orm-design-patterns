@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.Map;
 
 public class Query {
-    private CommandType commandType = null;
-    private boolean isGrouped = false;
-    private boolean distinct = false;
-    private List<String> tables = new ArrayList<>();
-    private List<String> columns = new ArrayList<>();
-    private List<String> conditions = new ArrayList<>();
-    private List<Object> values = new ArrayList<>();
-    private List<String> groupByColumns = new ArrayList<>();
-    private List<Map.Entry<AggregateFunction, String>> aggregateFunctions = new ArrayList<>();
-    private List<String> setColumns = new ArrayList<>();
+    CommandType commandType = null;
+    boolean isGrouped = false;
+    boolean distinct = false;
+    List<String> tables = new ArrayList<>();
+    List<String> columns = new ArrayList<>();
+    List<String> conditions = new ArrayList<>();
+    List<Object> values = new ArrayList<>();
+    List<String> groupByColumns = new ArrayList<>();
+    List<Map.Entry<AggregateFunction, String>> aggregateFunctions = new ArrayList<>();
+    List<String> setColumns = new ArrayList<>();
 
     public String toString() {
         if (commandType == null) {
@@ -103,55 +103,7 @@ public class Query {
         return sql.toString();
     }
 
-    CommandType getCommandType() {
-        return commandType;
-    }
-
-    void setCommandType(CommandType commandType) {
-        this.commandType = commandType;
-    }
-
-    boolean isGrouped() {
-        return isGrouped;
-    }
-
-    void setGrouped(boolean grouped) {
-        isGrouped = grouped;
-    }
-
-    boolean isDistinct() {
-        return distinct;
-    }
-
-    void setDistinct(boolean distinct) {
-        this.distinct = distinct;
-    }
-
-    List<String> getTables() {
-        return tables;
-    }
-
-    List<String> getColumns() {
-        return columns;
-    }
-
-    List<String> getConditions() {
-        return conditions;
-    }
-
-    List<Object> getValues() {
+    public List<Object> getValues() {
         return values;
-    }
-
-    List<String> getGroupByColumns() {
-        return groupByColumns;
-    }
-
-    List<Map.Entry<AggregateFunction, String>> getAggregateFunctions() {
-        return aggregateFunctions;
-    }
-
-    List<String> getSetColumns() {
-        return setColumns;
     }
 }

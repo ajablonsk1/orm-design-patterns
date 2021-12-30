@@ -7,63 +7,63 @@ public class QueryBuilder {
     private Query query = new Query();
 
     public QueryBuilder setCommandType(CommandType commandType) {
-        query.setCommandType(commandType);
+        query.commandType = commandType;
         return this;
     }
 
     public QueryBuilder addTable(Class cl) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        query.getTables().add(cl.getSimpleName().toLowerCase());
+        query.tables.add(cl.getSimpleName().toLowerCase());
         return this;
     }
 
     public QueryBuilder addTable(String table) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        query.getTables().add(table);
+        query.tables.add(table);
         return this;
     }
 
     public QueryBuilder addColumn(Field field) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        if (query.getCommandType() == CommandType.CREATE || query.getCommandType() == CommandType.ALTER) {
+        if (query.commandType == CommandType.CREATE || query.commandType == CommandType.ALTER) {
             String type = getSqlTypeFromClass(field.getType());
-            query.getColumns().add(field.getName().toLowerCase() + " " + type);
+            query.columns.add(field.getName().toLowerCase() + " " + type);
         }
-        if (query.getCommandType() == CommandType.SELECT || query.getCommandType() == CommandType.INSERT) {
-            query.getColumns().add(field.getName().toLowerCase());
+        if (query.commandType == CommandType.SELECT || query.commandType == CommandType.INSERT) {
+            query.columns.add(field.getName().toLowerCase());
         }
         return this;
     }
 
     public QueryBuilder addColumn(String column, String type) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        if (query.getCommandType() == CommandType.CREATE || query.getCommandType() == CommandType.ALTER) {
-            query.getColumns().add(column + " " + type);
+        if (query.commandType == CommandType.CREATE || query.commandType == CommandType.ALTER) {
+            query.columns.add(column + " " + type);
         }
-        if (query.getCommandType() == CommandType.SELECT) {
-            query.getColumns().add(column);
+        if (query.commandType == CommandType.SELECT) {
+            query.columns.add(column);
         }
         return this;
     }
 
     public QueryBuilder addCondition(String condition) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        query.getConditions().add(condition);
+        query.conditions.add(condition);
         return this;
     }
 
     public QueryBuilder addValue(Object value) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
         query.getValues().add(value);
@@ -71,75 +71,75 @@ public class QueryBuilder {
     }
 
     public QueryBuilder distinct(boolean distinct) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        if (query.getCommandType() != CommandType.SELECT) {
+        if (query.commandType != CommandType.SELECT) {
             throw new IllegalStateException("Command is not set to SELECT");
         }
-        query.setDistinct(distinct);
+        query.distinct = distinct;
         return this;
     }
 
     public QueryBuilder groupByColumn(String column) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        if (query.getCommandType() != CommandType.SELECT) {
+        if (query.commandType != CommandType.SELECT) {
             throw new IllegalStateException("Command is not set to SELECT");
         }
-        query.getGroupByColumns().add(column);
-        query.setGrouped(true);
+        query.groupByColumns.add(column);
+        query.isGrouped = true;
         return this;
     }
 
     public QueryBuilder groupByColumn(Field field) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        if (query.getCommandType() != CommandType.SELECT) {
+        if (query.commandType != CommandType.SELECT) {
             throw new IllegalStateException("Command is not set to SELECT");
         }
-        query.getGroupByColumns().add(field.getName().toLowerCase());
-        query.setGrouped(true);
+        query.groupByColumns.add(field.getName().toLowerCase());
+        query.isGrouped = true;
         return this;
     }
 
     public QueryBuilder addAggregate(AggregateFunction function, String column) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        if (query.getCommandType() != CommandType.SELECT) {
+        if (query.commandType != CommandType.SELECT) {
             throw new IllegalStateException("Command is not set to SELECT");
         }
-        if (!query.isGrouped()) {
+        if (!query.isGrouped) {
             throw new IllegalStateException("No GROUP BY statement");
         }
-        query.getAggregateFunctions().add(new AbstractMap.SimpleEntry<AggregateFunction, String>(function, column));
+        query.aggregateFunctions.add(new AbstractMap.SimpleEntry<AggregateFunction, String>(function, column));
         return this;
     }
 
     public QueryBuilder setColumn(String column, Object value) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        if (query.getCommandType() != CommandType.UPDATE) {
+        if (query.commandType != CommandType.UPDATE) {
             throw new IllegalStateException("Command is not set to UPDATE");
         }
-        query.getSetColumns().add(column + " = ?");
-        query.getValues().add(value);
+        query.setColumns.add(column + " = ?");
+        query.values.add(value);
         return this;
     }
 
     public QueryBuilder setColumn(Field column, Object value) {
-        if (query.getCommandType() == null) {
+        if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        if (query.getCommandType() != CommandType.UPDATE) {
+        if (query.commandType != CommandType.UPDATE) {
             throw new IllegalStateException("Command is not set to UPDATE");
         }
-        query.getSetColumns().add(column.getName().toLowerCase() + "= ?");
-        query.getValues().add(value);
+        query.setColumns.add(column.getName().toLowerCase() + "= ?");
+        query.values.add(value);
         return this;
     }
 
