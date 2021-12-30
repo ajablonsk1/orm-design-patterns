@@ -7,10 +7,7 @@ public enum AggregateFunction {
     SUM,
     AVG;
 
-    private String columm;
-
-    @Override
-    public String toString() {
+    public String toString(String columm) {
         switch (this) {
             case COUNT -> {
                 return "COUNT("+columm+")";
@@ -31,9 +28,5 @@ public enum AggregateFunction {
                 return "INCORRECT("+columm+")";
             }
         }
-    }
-
-    public void setColumm(String columm) {
-        this.columm = columm;
     }
 }
