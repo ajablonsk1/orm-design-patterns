@@ -1,5 +1,7 @@
 package orm.session;
 
+import orm.sql.Query;
+
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
@@ -28,11 +30,11 @@ public class Executor {
         this.urlHasCredentials = true;
     }
 
-    public List<Optional<CachedRowSet>> execute(List<String> queries) {
+    public List<Optional<CachedRowSet>> execute(List<Query> queries) {
         List<Optional<CachedRowSet>> results = new ArrayList<>();
         try (Connection conn = getConnection()){
             conn.setAutoCommit(false);
-            for (String query : queries) {
+            for (Query query : queries) {
                 results.add(executeSingleQuery(conn, query));
             }
             conn.commit();
@@ -43,7 +45,7 @@ public class Executor {
         return results;
     }
 
-    public Optional<CachedRowSet> execute(String query) {
+    public Optional<CachedRowSet> execute(Query query) {
         Optional<CachedRowSet> result = Optional.empty();
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
@@ -56,9 +58,13 @@ public class Executor {
         return result;
     }
 
-    private Optional<CachedRowSet> executeSingleQuery(Connection conn, String query) throws SQLException {
+    private Optional<CachedRowSet> executeSingleQuery(Connection conn, Query query) throws SQLException {
         Optional<CachedRowSet> result = Optional.empty();
-        try (PreparedStatement statement = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = conn.prepareStatement(query.toString(), PreparedStatement.RETURN_GENERATED_KEYS)) {
+            List<Object> values = query.getValues();
+            for (int i = 0; i < values.size(); i++) {
+                statement.setObject(i+1, values.get(i));
+            }
             boolean hasResults = statement.execute();
             if (hasResults) {
                 CachedRowSet rowSet = cacheAndClose(statement.getResultSet());
