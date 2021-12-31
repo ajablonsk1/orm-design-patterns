@@ -1,4 +1,4 @@
-package orm.executor;
+package orm.session;
 
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
@@ -8,20 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class SQLExecutor {
+public class Executor {
     private final String url;
     private final String user;
     private final String password;
     private final Boolean urlHasCredentials;
 
-    public SQLExecutor(String url) {
+    public Executor(String url) {
         this.url = url;
         this.user = null;
         this.password = null;
         this.urlHasCredentials = false;
     }
 
-    public SQLExecutor(String url, String user, String password) {
+    public Executor(String url, String user, String password) {
         this.url = url;
         this.user = user;
         this.password = password;

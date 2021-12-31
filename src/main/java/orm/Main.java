@@ -1,15 +1,14 @@
 package orm;
 
-import orm.scanner.ClassFinder;
-import orm.scanner.ClassScanner;
-import orm.sql.CreateTableSqlBuilder;
+import orm.schema.ClassFinder;
+import orm.schema.ClassScanner;
 
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception {
         ClassFinder classFinder = new ClassFinder();
-        Set<Class> annotatedClasses = classFinder.loadClasses();
+        Set<Class> annotatedClasses = classFinder.findEntityClasses();
         for (Class cl : annotatedClasses) {
             System.out.println(cl.getName());
         }

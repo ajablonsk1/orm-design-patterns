@@ -1,4 +1,4 @@
-package orm.scanner;
+package orm.schema;
 
 import orm.annotations.*;
 
