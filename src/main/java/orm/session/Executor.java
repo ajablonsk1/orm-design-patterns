@@ -14,19 +14,14 @@ public class Executor {
     private final String url;
     private final String user;
     private final String password;
+    private final String databaseName;
     private final Boolean urlHasCredentials;
 
-    public Executor(String url) {
-        this.url = url;
-        this.user = null;
-        this.password = null;
-        this.urlHasCredentials = false;
-    }
-
-    public Executor(String url, String user, String password) {
+    public Executor(String url, String user, String password, String databaseName) {
         this.url = url;
         this.user = user;
         this.password = password;
+        this.databaseName = databaseName;
         this.urlHasCredentials = true;
     }
 
@@ -78,7 +73,9 @@ public class Executor {
     }
 
     private Connection getConnection() throws SQLException {
-        return urlHasCredentials ? DriverManager.getConnection(url, user, password) : DriverManager.getConnection(url);
+        var connection = DriverManager.getConnection(url, user, password);
+        connection.prepareStatement("USE "+databaseName+";").execute();
+        return connection;
     }
 
     private CachedRowSet cacheAndClose(ResultSet resultSet) throws SQLException {

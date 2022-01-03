@@ -10,15 +10,25 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class SchemaCreator {
     private List<Query> queries = new ArrayList<>();
-    private Executor executor = new Executor("jdbc:mysql://mysql.agh.edu.pl:3306", "pmakare1", "kmjUCKSydDxdZ022");
+    private Executor executor = new Executor("jdbc:mysql://mysql.agh.edu.pl:3306", "pmakare1", "kmjUCKSydDxdZ022", "pmakare1");
     private ClassFinder finder = new ClassFinder();
-    private ClassScanner classScanner = new ClassScanner();
+    private ClassScanner scanner = new ClassScanner();
 
-    public void createTables(){
-
+    public void createTables() throws Exception {
+        Set<Class> entityClasses = finder.findEntityClasses();
+        for (Class cl: entityClasses){
+            List<Field> columns = scanner.getColumns(cl);
+            QueryBuilder queryBuilder = new QueryBuilder();
+            queryBuilder.setCommandType(CommandType.CREATE)
+                        .addTable(cl)
+                        .build();
+            columns.forEach(queryBuilder::addColumn);
+            executor.execute(queryBuilder.build());
+        }
 
 //        for (Annotation annotation : classAnnotations) {
 //            if (annotation.annotationType() == Entity.class) {
