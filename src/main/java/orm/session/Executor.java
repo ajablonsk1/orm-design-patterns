@@ -60,6 +60,7 @@ public class Executor {
             for (int i = 0; i < values.size(); i++) {
                 statement.setObject(i+1, values.get(i));
             }
+            System.out.println("Executing: "+query);
             boolean hasResults = statement.execute();
             if (hasResults) {
                 CachedRowSet rowSet = cacheAndClose(statement.getResultSet());

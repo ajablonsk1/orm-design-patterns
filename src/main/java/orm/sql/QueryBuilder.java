@@ -59,6 +59,11 @@ public class QueryBuilder {
         return this;
     }
 
+    public QueryBuilder addId(){
+        query.columns.add("id INT NOT NULL AUTO_INCREMENT PRIMARY KEY");
+        return this;
+    }
+
     public QueryBuilder addForeignKey(String column, String referencedTable){
         this.addColumn(column, "INT");
         query.foreignKeys.add("FOREIGN KEY ("+column+") REFERENCES "+referencedTable+"(id)");

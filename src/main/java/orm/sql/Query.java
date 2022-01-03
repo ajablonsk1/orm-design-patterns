@@ -25,7 +25,6 @@ public class Query {
         if (commandType == CommandType.CREATE) {
             sql.append(commandType + " ");
             sql.append(String.join(", ", tables));
-            columns.add("id INT NOT NULL AUTO_INCREMENT PRIMARY KEY");
             sql.append(" (");
             sql.append(String.join(", ", columns));
             sql.append(");");
@@ -107,6 +106,7 @@ public class Query {
         }
         return sql.toString();
     }
+
 
     public List<Object> getValues() {
         return values;
