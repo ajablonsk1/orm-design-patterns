@@ -1,3 +1,5 @@
+package orm.sql;
+
 import org.junit.jupiter.api.Test;
 import orm.sql.*;
 
@@ -5,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-public class BuilderTests {
+public class BuilderTest {
 
     @Test
     public void createTableSqlBuilder(){
@@ -17,6 +19,20 @@ public class BuilderTests {
                 .build();
         String s1 = query.toString();
         String s2 = "CREATE TABLE table1 (column1 int, column2 varchar(50), id INT NOT NULL AUTO_INCREMENT PRIMARY KEY);";
+        assertEquals(s2, s1);
+    }
+
+    @Test
+    public void alterTableSqlBuilder(){
+        QueryBuilder builder = new QueryBuilder();
+        Query query = builder.setCommandType(CommandType.ALTER)
+                .addTable("table1")
+                .addColumn("column1", "int")
+                .addColumn("column2", "varchar(50)")
+                .addForeignKey("fk_id","referencedTable")
+                .build();
+        String s1 = query.toString();
+        String s2 = "ALTER TABLE table1 ADD column1 int, ADD column2 varchar(50), ADD fk_id INT, ADD FOREIGN KEY (fk_id) REFERENCES referencedTable(id);";
         assertEquals(s2, s1);
     }
 

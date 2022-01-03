@@ -6,6 +6,11 @@ import java.util.*;
 public class QueryBuilder {
     private Query query = new Query();
 
+    public QueryBuilder(){}
+    public QueryBuilder(CommandType commandType){
+        this.setCommandType(commandType);
+    }
+
     public QueryBuilder setCommandType(CommandType commandType) {
         query.commandType = commandType;
         return this;
@@ -51,6 +56,19 @@ public class QueryBuilder {
         if (query.commandType == CommandType.SELECT) {
             query.columns.add(column);
         }
+        return this;
+    }
+
+    public QueryBuilder addForeignKey(String column, String referencedTable){
+        this.addColumn(column, "INT");
+        query.foreignKeys.add("FOREIGN KEY ("+column+") REFERENCES "+referencedTable+"(id)");
+        return this;
+    }
+
+    public QueryBuilder addForeignKey(Field field){
+        String column = field.getName().toLowerCase() + "_id";
+        String referencedTable = field.getType().getSimpleName().toLowerCase();
+        addForeignKey(column, referencedTable);
         return this;
     }
 

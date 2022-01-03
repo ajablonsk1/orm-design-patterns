@@ -1,6 +1,6 @@
 package orm.schema;
 
-import orm.annotations.*;
+import orm.annotations.OneToOne;
 import orm.session.Executor;
 import orm.sql.CommandType;
 import orm.sql.Query;
@@ -14,21 +14,49 @@ import java.util.Set;
 
 public class SchemaCreator {
     private List<Query> queries = new ArrayList<>();
-    private Executor executor = new Executor("jdbc:mysql://mysql.agh.edu.pl:3306", "pmakare1", "kmjUCKSydDxdZ022", "pmakare1");
+    private Executor executor = new Executor(
+            "jdbc:mysql://mysql.agh.edu.pl:3306",
+            "pmakare1",
+            "kmjUCKSydDxdZ022",
+            "pmakare1");
     private ClassFinder finder = new ClassFinder();
     private ClassScanner scanner = new ClassScanner();
+    private Set<Class> entityClasses;
 
-    public void createTables() throws Exception {
-        Set<Class> entityClasses = finder.findEntityClasses();
-        for (Class cl: entityClasses){
-            List<Field> columns = scanner.getColumns(cl);
-            QueryBuilder queryBuilder = new QueryBuilder();
-            queryBuilder.setCommandType(CommandType.CREATE)
-                        .addTable(cl)
-                        .build();
-            columns.forEach(queryBuilder::addColumn);
-            executor.execute(queryBuilder.build());
+    public void createSchema() throws Exception {
+        entityClasses = finder.findEntityClasses();
+        addQueriesToCreateTables();
+        addQueriesForOneToOnes();
+
+        for (Query q: queries){
+            System.out.println(q);
         }
+
+        // przy strategii Class Table Inheritance nie potrzeba tu dodatkowego kodu do obsługi dziedziczenia
+        executor.execute(queries);
+    }
+    public void addQueriesToCreateTables(){
+        for (Class clazz: entityClasses){
+            List<Field> columns = scanner.getColumns(clazz);
+            QueryBuilder queryBuilder = new QueryBuilder(CommandType.CREATE).addTable(clazz);
+            columns.forEach(queryBuilder::addColumn);
+            queries.add(queryBuilder.build());
+        }
+    }
+    public void addQueriesForOneToOnes(){
+        for (Class clazz: entityClasses){
+            QueryBuilder queryBuilder = new QueryBuilder(CommandType.ALTER).addTable(clazz);
+            List<Field> fields = scanner.getOneToOneFields(clazz)
+                    .stream()
+                    .filter(f -> f.getAnnotation(OneToOne.class).foreignKeyInThisTable())
+                    .toList();
+            if (fields.size() > 0) {
+                fields.forEach(queryBuilder::addForeignKey);
+                queries.add(queryBuilder.build());
+            }
+        }
+    }
+}
 
 //        for (Annotation annotation : classAnnotations) {
 //            if (annotation.annotationType() == Entity.class) {
@@ -72,5 +100,4 @@ public class SchemaCreator {
 //                }
 //            }
 //        }
-    }
-}
+

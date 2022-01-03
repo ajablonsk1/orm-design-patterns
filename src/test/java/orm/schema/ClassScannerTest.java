@@ -15,7 +15,7 @@ public class ClassScannerTest {
         //given
         class TestClass{
             @Column private String someColumnField;
-            @Column @OneToOne private String someOneToOneField;
+            @Column @OneToOne(foreignKeyInThisTable = true) private String someOneToOneField;
             private String someNonColumnField;
         }
         ClassScanner scanner = new ClassScanner();
