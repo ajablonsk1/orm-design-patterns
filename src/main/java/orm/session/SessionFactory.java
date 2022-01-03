@@ -21,7 +21,7 @@ public class SessionFactory {
     }
 
     public Session createSession() throws Exception {
-        //TODO: kontrolowanie czy nie tworzymy sesji do tej samej bazy
+        //TODO: threadLocal
         Session session = new Session();
         sessions.add(session);
         return session;

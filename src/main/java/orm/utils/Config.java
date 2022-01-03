@@ -33,7 +33,6 @@ public class Config {
         JsonElement connectionPoolSizeJson = json.getAsJsonObject().get("connection_pool_size");
         connectionPoolSize = connectionPoolSizeJson.getAsInt();
         reader.close();
-
     }
 
     public static synchronized Config getInstance() throws Exception {

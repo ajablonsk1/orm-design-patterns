@@ -1,3 +1,5 @@
+package orm.utils;
+
 import org.junit.jupiter.api.Test;
 import orm.utils.Config;
 
