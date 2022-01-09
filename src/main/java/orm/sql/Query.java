@@ -52,8 +52,9 @@ public class Query {
             }
             sql.append(" VALUES (");
             sql.append("?");
-            values.remove(0);
+            Object tmp = values.remove(0);
             values.forEach((value) -> sql.append(", ?"));
+            values.add(0, tmp);
             sql.append(");");
         }
         if (commandType == CommandType.SELECT) {

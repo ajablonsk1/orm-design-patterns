@@ -53,7 +53,7 @@ public class QueryBuilder {
         if (query.commandType == CommandType.CREATE || query.commandType == CommandType.ALTER) {
             query.columns.add(column + " " + type);
         }
-        if (query.commandType == CommandType.SELECT) {
+        if (query.commandType == CommandType.SELECT || query.commandType == CommandType.INSERT) {
             query.columns.add(column);
         }
         return this;
@@ -90,7 +90,7 @@ public class QueryBuilder {
         if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
-        query.getValues().add(value);
+        query.values.add(value);
         return this;
     }
 

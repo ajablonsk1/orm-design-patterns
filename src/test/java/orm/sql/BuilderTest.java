@@ -59,6 +59,16 @@ public class BuilderTest {
         String s1 = query.toString();
         String s2 = "INSERT INTO table1 VALUES (?, ?);";
         assertEquals(s2, s1);
+
+        builder = new QueryBuilder();
+        query = builder.setCommandType(CommandType.INSERT)
+                .addTable("ID")
+                .addColumn("id", null)
+                .addValue(1)
+                .build();
+        s1 = query.toString();
+        s2 = "INSERT INTO ID (id) VALUES (?);";
+        assertEquals(s2, s1);
     }
 
     @Test
