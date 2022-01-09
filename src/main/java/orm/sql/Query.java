@@ -61,7 +61,7 @@ public class Query {
             if (distinct)
                 sql.append("DISTINCT ");
             if (aggregateFunctions.size() == 0 && columns.size() == 0)
-                sql.append("(*) ");
+                sql.append(" * ");
             sql.append(String.join(", ", columns));
             if (aggregateFunctions.size() != 0) {
                 Map.Entry<AggregateFunction, String> entry = aggregateFunctions.remove(0);

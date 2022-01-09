@@ -59,6 +59,7 @@ public class QueryBuilder {
         return this;
     }
 
+    //TODO chyba nie baza sie tym zajmuje tylko my
     public QueryBuilder addId(){
         query.columns.add("id INT NOT NULL AUTO_INCREMENT PRIMARY KEY");
         return this;

@@ -17,9 +17,9 @@ public class SchemaCreator {
     private List<Query> queries = new ArrayList<>();
     private Executor executor = new Executor(
             "jdbc:mysql://mysql.agh.edu.pl:3306",
-            "pmakare1",
-            "kmjUCKSydDxdZ022",
-            "pmakare1");
+            "pholowi1",
+            "Qo1J2fAHMTSADYdW",
+            "pholowi1");
     private ClassFinder finder = new ClassFinder();
     private ClassScanner scanner = new ClassScanner();
     private Set<Class> entityClasses;

@@ -9,4 +9,20 @@ public class Account {
     @Column String userName;
     @Column String password;
     @OneToOne(foreignKeyInThisTable = false) Student student;
+
+    public Account() {
+
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
 }
