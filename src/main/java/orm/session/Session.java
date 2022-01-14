@@ -5,6 +5,7 @@ import orm.session.Executor;
 import orm.schema.ClassFinder;
 import orm.schema.ClassScanner;
 import orm.sql.CommandType;
+import orm.sql.IdGiver;
 import orm.sql.Query;
 import orm.sql.QueryBuilder;
 
@@ -17,6 +18,7 @@ import java.util.*;
 
 public class Session {
     private Executor executor;
+    private IdGiver idGiver;
     private Map<Integer, Object> identityMap = new HashMap<>();
     private Set<Object> objectsToUpdate = new HashSet<>();
     private Set<Object> objectsToDelete = new HashSet<>();
@@ -140,29 +142,6 @@ public class Session {
         //TODO
     }
 
-    private void updateId(Integer id) {
-        QueryBuilder queryBuilder = new QueryBuilder(CommandType.UPDATE);
-        Query query = queryBuilder.addTable("id")
-                .setColumn("id", id+1)
-                .build();
-        executor.execute(query);
-    }
-
-    private Integer getId() throws SQLException {
-        QueryBuilder queryBuilder = new QueryBuilder(CommandType.SELECT);
-        Query query = queryBuilder.addColumn("id", "")
-                .addTable("id")
-                .build();
-        Optional<CachedRowSet> crs = executor.execute(query);
-        if(crs.isPresent()){
-            return crs.get().getInt(1);
-        }
-        else{
-            throw new IllegalStateException("Cannot take id record");
-        }
-    }
-
-
     private void insertObjectRecord(Object object){
         QueryBuilder queryBuilder = new QueryBuilder(CommandType.INSERT);
         List<Field> columns = classScanner.getColumns(object.getClass());
@@ -201,9 +180,8 @@ public class Session {
                     insertClassRecord(clazz, object);
                 });
                 try {
-                    int id = getId();
+                    int id = idGiver.getId();
                     identityMap.put(id, object);
-                    updateId(id);
                     insertObjectRecord(object);
                 } catch (SQLException e) {
                     e.printStackTrace();
