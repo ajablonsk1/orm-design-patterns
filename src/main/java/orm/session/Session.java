@@ -29,7 +29,8 @@ public class Session {
     // konstruktor package-private, aby tylko klasa SessionFactory mogła tworzyć obiekty klasy Session
     Session() throws Exception {
         //TODO: parametry połączenia przez plik konfiguracyjny
-        this.executor = new Executor("jdbc:mysql://mysql.agh.edu.pl:3306", "pholowi1", "Qo1J2fAHMTSADYdW", "pholowi1");
+        executor = new Executor("jdbc:mysql://mysql.agh.edu.pl:3306", "pholowi1", "Qo1J2fAHMTSADYdW", "pholowi1");
+        idGiver = new IdGiver("jdbc:mysql://mysql.agh.edu.pl:3306", "pholowi1", "Qo1J2fAHMTSADYdW", "pholowi1");
         classFinder = new ClassFinder();
         classScanner = new ClassScanner();
     }
