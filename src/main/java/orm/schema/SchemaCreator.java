@@ -2,6 +2,7 @@ package orm.schema;
 
 import orm.annotations.ManyToOne;
 import orm.annotations.OneToOne;
+import orm.session.ConnectionPool;
 import orm.session.Executor;
 import orm.sql.CommandType;
 import orm.sql.Query;
@@ -15,14 +16,14 @@ import java.util.Set;
 
 public class SchemaCreator {
     private List<Query> queries = new ArrayList<>();
-    private Executor executor = new Executor(
-            "jdbc:mysql://mysql.agh.edu.pl:3306",
-            "pholowi1",
-            "Qo1J2fAHMTSADYdW",
-            "pholowi1");
+    private final Executor executor;
     private ClassFinder finder = new ClassFinder();
     private ClassScanner scanner = new ClassScanner();
     private Set<Class> entityClasses;
+
+    public SchemaCreator(ConnectionPool connectionPool) {
+        this.executor = new Executor(connectionPool);
+    }
 
     public void createSchema() throws Exception {
         entityClasses = finder.findEntityClasses();

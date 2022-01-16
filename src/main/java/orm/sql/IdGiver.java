@@ -1,4 +1,5 @@
 package orm.sql;
+import orm.session.ConnectionPool;
 import orm.session.Executor;
 
 import javax.sql.rowset.CachedRowSet;
@@ -9,8 +10,8 @@ public class IdGiver {
 
     private Executor executor;
 
-    public IdGiver(String url, String user, String password, String databaseName){
-        this.executor = new Executor(url, user, password, databaseName);
+    public IdGiver(ConnectionPool connectionPool){
+        this.executor = new Executor(connectionPool);
     }
 
     public int getId() throws SQLException {

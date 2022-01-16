@@ -11,50 +11,27 @@ import java.util.List;
 import java.util.Optional;
 
 public class Executor {
-    private final String url;
-    private final String user;
-    private final String password;
-    private final String databaseName;
-    private final Boolean urlHasCredentials;
+    private final ConnectionPool connectionPool;
 
-    public Executor(String url, String user, String password, String databaseName) {
-        this.url = url;
-        this.user = user;
-        this.password = password;
-        this.databaseName = databaseName;
-        this.urlHasCredentials = true;
+    public Executor(ConnectionPool connectionPool) {
+        this.connectionPool = connectionPool;
     }
 
     public List<Optional<CachedRowSet>> execute(List<Query> queries) {
         List<Optional<CachedRowSet>> results = new ArrayList<>();
-        try (Connection conn = getConnection()){
-            conn.setAutoCommit(false);
-            for (Query query : queries) {
-                results.add(executeSingleQuery(conn, query));
-            }
-            conn.commit();
-        } catch (SQLException e) {
-            // TODO: obsługa błędu
-            e.printStackTrace();
+        for (Query query : queries) {
+            results.add(executeSingleQuery(query));
         }
         return results;
     }
 
     public Optional<CachedRowSet> execute(Query query) {
-        Optional<CachedRowSet> result = Optional.empty();
-        try (Connection conn = getConnection()) {
-            conn.setAutoCommit(false);
-            result = executeSingleQuery(conn, query);
-            conn.commit();
-        } catch (SQLException e) {
-            // TODO: obsługa błędu
-            e.printStackTrace();
-        }
-        return result;
+        return executeSingleQuery(query);
     }
 
-    private Optional<CachedRowSet> executeSingleQuery(Connection conn, Query query) throws SQLException {
+    private Optional<CachedRowSet> executeSingleQuery(Query query) {
         Optional<CachedRowSet> result = Optional.empty();
+        Connection conn = getConnection();
         try (PreparedStatement statement = conn.prepareStatement(query.toString(), PreparedStatement.RETURN_GENERATED_KEYS)) {
             List<Object> values = query.getValues();
             for (int i = 0; i < values.size(); i++) {
@@ -69,14 +46,28 @@ public class Executor {
                 CachedRowSet rowSet = cacheAndClose(statement.getGeneratedKeys());
                 result = Optional.of(rowSet);
             }
+        } catch (SQLException e) {
+            // TODO: Obsługa błędu
+            e.printStackTrace();
+        } finally {
+            releaseConnection();
         }
         return result;
     }
 
-    private Connection getConnection() throws SQLException {
-        var connection = DriverManager.getConnection(url, user, password);
-        connection.prepareStatement("USE "+databaseName+";").execute();
+    private Connection getConnection() {
+        Connection connection = null;
+        try {
+            connection = connectionPool.getConnection();
+        } catch (InterruptedException e) {
+            // TODO: Obsługa błędu
+            e.printStackTrace();
+        }
         return connection;
+    }
+
+    private void releaseConnection() {
+        connectionPool.releaseConnection();
     }
 
     private CachedRowSet cacheAndClose(ResultSet resultSet) throws SQLException {
