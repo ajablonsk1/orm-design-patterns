@@ -6,6 +6,6 @@ import orm.annotations.ManyToOne;
 
 @Entity
 public class Grade {
-    @Column int value;
-    @ManyToOne Student student;
+    @Column public int value;
+    @ManyToOne public Student student;
 }

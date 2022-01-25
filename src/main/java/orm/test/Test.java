@@ -7,10 +7,10 @@ import orm.annotations.Id;
 @Entity
 public class Test {
     @Id
-    int field1;
+    public int field1;
 
     @Column
-    String field2;
+    public String field2;
 
-    Object field3;
+    public Object field3;
 }

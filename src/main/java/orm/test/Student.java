@@ -1,19 +1,29 @@
 package orm.test;
 
-import orm.annotations.Column;
-import orm.annotations.Entity;
-import orm.annotations.OneToOne;
+import orm.annotations.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Student{
-    @Column String firstName;
-    @Column String lastName;
-    @OneToOne(foreignKeyInThisTable = true) Account account;
-    @OneToOne(foreignKeyInThisTable = false)
+    @Column public String firstName;
+    @Column public String lastName;
+    @OneToOne(foreignKeyInThisTable = true) public Account account;
+    @OneToMany public List<Grade> grades;
+
+    @ManyToMany(tableName = "professorstudents", columnName = "professor_id")
+    List<Professor> professors = new ArrayList<>();
+
     LoadTest loadTestForPrimitive;
 
     public Student() {
     }
+
+    public void addProfessor(Professor e){
+        professors.add(e);
+    }
+
 
     public String getFirstName() {
         return firstName;

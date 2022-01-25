@@ -1,6 +1,7 @@
 package orm.sql;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 public class QueryBuilder {
@@ -73,8 +74,23 @@ public class QueryBuilder {
 
     public QueryBuilder addForeignKey(Field field){
         String column = field.getName().toLowerCase() + "_id";
-        String referencedTable = field.getType().getSimpleName().toLowerCase();
-        addForeignKey(column, referencedTable);
+        Class clazz = field.getType();
+        String refTable;
+        // if field is a collection, take inside type
+        if (Collection.class.isAssignableFrom(clazz)){
+            ParameterizedType wrapperType = (ParameterizedType) field.getGenericType();
+            refTable = Arrays.stream(
+                        wrapperType
+                            .getActualTypeArguments()[0]
+                            .getTypeName()
+                            .split("\\."))
+                    .reduce((first, second) -> second)
+                    .orElse(null)
+                    .toLowerCase();
+        }
+        else refTable = clazz.getSimpleName().toLowerCase();
+        System.out.println(refTable);
+        addForeignKey(column, refTable);
         return this;
     }
 

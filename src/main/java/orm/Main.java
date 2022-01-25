@@ -3,26 +3,34 @@ package orm;
 
 import orm.session.Session;
 import orm.session.SessionFactory;
-import orm.test.Account;
-import orm.test.Student;
-import orm.test.Test;
+import orm.test.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        //Session session = SessionFactory.getInstance("jdbc:mysql://mysql.agh.edu.pl:3306/pholowi1", "pholowi1", "Qo1J2fAHMTSADYdW").createSession();
-        Session session = SessionFactory.getInstance("jdbc:mysql://localhost:3306/test", "root", "password").createSession();
+        Session session = SessionFactory.getInstance().createSession();
 
+        Account account = new Account();
+        account.setUserName("misiek2000");
+        account.setPassword("super-tajne-haslo");
 
-        Student student = (Student)session.load(Student.class,2);
+        Student student = new Student();
+        student.setFirstName("Michał");
+        student.setLastName("Studencki");
 
-        Account account = student.getAccount();
+        student.setAccount(account);
+        account.setStudent(student);
 
-        System.out.println(account.getUserName());
+        Professor professor = new Professor();
+        professor.setFirstName("Jan");
+        professor.setLastName("Profesorski");
 
-        if (student == account.getStudent()){
-            System.out.println("ten sama ref jest ok");
-        }else {
-            System.out.println("nie jest ok");
-        }
+        professor.addStudent(student);
+        student.addProfessor(professor);
+
+        session.save(student);
+        session.save(professor);
+        session.save(account);
+        session.flush();
+
     }
 }

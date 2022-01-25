@@ -6,9 +6,12 @@ import orm.annotations.OneToOne;
 
 @Entity
 public class Account {
-    @Column String userName;
-    @Column String password;
-    @OneToOne(foreignKeyInThisTable = false) Student student;
+    @Column
+    public String userName;
+    @Column
+    public String password;
+    @OneToOne(foreignKeyInThisTable = false)
+    public Student student;
 
     public Account() {
 
@@ -24,5 +27,17 @@ public class Account {
 
     public String getUserName() {
         return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

@@ -17,7 +17,17 @@ public class Query {
     List<String> setColumns = new ArrayList<>();
     List<String> foreignKeys = new ArrayList<>();
 
+    String customString = null;
+
+    public Query(){}
+    public Query(String s) {
+        customString = s;
+    }
+
     public String toString() {
+        if (customString != null){
+            return customString;
+        }
         if (commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
@@ -27,8 +37,11 @@ public class Query {
             sql.append(String.join(", ", tables));
             sql.append(" (");
             sql.append(String.join(", ", columns));
+            if (foreignKeys.size() > 0) {
+                sql.append(", ");
+                sql.append(String.join(", ", foreignKeys));
+            }
             sql.append(");");
-            // TODO: foreign key
         }
         if (commandType == CommandType.DELETE) {
             sql.append(commandType + " ");

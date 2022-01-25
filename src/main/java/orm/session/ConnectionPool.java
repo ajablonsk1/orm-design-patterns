@@ -1,6 +1,8 @@
 package orm.session;
 
 
+import orm.utils.Config;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,12 +20,16 @@ public class ConnectionPool {
     private int lastUsed = 0;
     private boolean closed = false;
 
-    public ConnectionPool(String url, String user, String password, int size) throws SQLException {
-        this.size = size;
+    public ConnectionPool() throws Exception {
+        Config config = Config.getInstance();
+        this.size = config.getConnectionPoolSize();
         this.connections = new Connection[size];
         this.used = new boolean[size];
         for (int i = 0; i < size; i++) {
-            connections[i] = DriverManager.getConnection(url, user, password);
+            connections[i] = DriverManager.getConnection(
+                    config.getDatabaseUrl(),
+                    config.getUser(),
+                    config.getPassword());
             used[i] = false;
         }
     }

@@ -11,23 +11,25 @@ public class SessionFactory {
     private volatile static SessionFactory sessionFactory;
     private List<Session> sessions = new ArrayList<>();
     private ConnectionPool connectionPool;
+    //private ThreadLocal<Session> session;
 
-    private SessionFactory (String url, String user, String password) {
+    private SessionFactory () {
         try {
-            this.connectionPool = new ConnectionPool(url, user, password, Config.getInstance().getConnectionPoolSize());
+            this.connectionPool = new ConnectionPool();
             SchemaCreator schemaCreator = new SchemaCreator(connectionPool);
-            //schemaCreator.createSchema();
+            if (Config.getInstance().isCreateSchemaOnStart())
+                schemaCreator.createSchema();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static SessionFactory getInstance(String url, String user, String password){
+    public static SessionFactory getInstance(){
         // lazy-loading, double null-check, thread-safe Singleton
         if (sessionFactory == null){
             synchronized (SessionFactory.class){
                 if (sessionFactory == null){
-                    sessionFactory = new SessionFactory(url, user, password);
+                    sessionFactory = new SessionFactory();
                 }
             }
         }
