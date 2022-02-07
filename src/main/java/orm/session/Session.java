@@ -40,127 +40,77 @@ public class Session {
     }
 
     //TODO refactor
-    public Object load(Class<?> clazz,Integer id) throws NoSuchMethodException, SQLException {
+    public Object load(Class<?> clazz, Integer id) throws NoSuchMethodException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         //sprawdz czy juz byl wczytany
-
-        if (identityMap.containsKey(id)){
+        if (identityMap.containsKey(id))
             return identityMap.get(id);
-        }
-        //wczytaj dane z obiektu
 
+        // wez wszystkie pola z adnotacjami do ustawienia
+        Field[] annotatedFields = classScanner.getAnnotatedFields(clazz).toArray(new Field[0]);
+        AccessibleObject.setAccessible(annotatedFields, true);
 
-        QueryBuilder queryBuilder = new QueryBuilder(CommandType.SELECT);
-        Query query = queryBuilder.addTable(clazz)
-                .addCondition("id = " + id)
-                .build();
+        Object instance = clazz.getDeclaredConstructor().newInstance();
 
-
-        // jakis throw czy cos
-        CachedRowSet cachedRowSet = executor.execute(query).orElseThrow(
-                SQLException::new);
-
-
-
-
-        //wez wszystkie pola z adnotacjami do ustawienia
-        //TODO metoda w classfinder tu zle
-        Field[] annotatedFields = clazz.getDeclaredFields ();
-        AccessibleObject.setAccessible (annotatedFields, true);
-
-        Object instance = null;
-        try {
-            instance = clazz.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        identityMap.put(id,instance);
-
-        //move cursor
+        // wczytaj pola obiektu z bazy danych
+        Query query = new QueryBuilder(CommandType.SELECT).addTable(clazz)
+                            .addCondition("id = " + id).build();
+        CachedRowSet cachedRowSet = executor.execute(query)
+                            .orElseThrow(SQLException::new);
         cachedRowSet.next();
 
-        for (Field field: annotatedFields){
+        // już tutaj wstawiamy do identityMap ze względu na kaskadowe ładowanie
+        identityMap.put(id, instance);
 
+        for (Field field: annotatedFields){
             Class<?> fieldType = field.getType();
             Object fieldValue = null;
-            //System.out.println(fieldType);
 
-            //OnetoOne case
             if (field.isAnnotationPresent(OneToOne.class)){
+                String[] a = fieldType.toString().split("\\.");
+                String entityName = a[a.length-1].toLowerCase();
+                Integer otherId = field.getAnnotation(OneToOne.class).foreignKeyInThisTable()
+                                    ? cachedRowSet.getInt(entityName + "_id")
+                                    : findKey(entityName, id,clazz.toString().toLowerCase()+"_id");
+                fieldValue = load(fieldType, otherId);
+            }
+            else if (field.isAnnotationPresent(OneToMany.class)) {
+                //tu jest lista generic zwraca x List<x>
+                String[] a = field.getGenericType().toString().split("[.>]");
+                String entityNameToLoad = a[a.length-1].toLowerCase();
 
-                OneToOne annotation = field.getAnnotation(OneToOne.class);
-                boolean foreignKeyInThisTable = annotation.foreignKeyInThisTable();
+                // build query to get a list of items
+                Query query1 = new QueryBuilder(CommandType.SELECT).addTable(entityNameToLoad)
+                                .addColumn("id","")
+                                .addCondition(clazz.getSimpleName().toLowerCase() + "_id = " +id)
+                                .build();
 
-                String[] array = fieldType.toString().split("\\.");
-                String entityName = array[array.length-1].toLowerCase();
+                CachedRowSet set = executor.execute(query1).orElseThrow(SQLException::new);
 
-
-                if (foreignKeyInThisTable){
-                    Integer foreignKey = cachedRowSet.getInt(entityName + "_id");
-                    fieldValue = load(fieldType,foreignKey);
-                }else{
-                    //TODO zmiana nazwy
-                    Integer idA = findKey(entityName,id,clazz.toString().toLowerCase()+"_id");
-                    //System.out.println(fieldType);
-                    fieldValue = load(fieldType,idA);
-                }
-            }else if (field.isAnnotationPresent(OneToMany.class)) {
-                //tu jest lista generic daje zwraca x List<x>
-                Type genericFieldType = field.getGenericType();
-
-
-                String[] array = genericFieldType.toString().split("[.>]");
-                String entityNameToLoad = array[array.length-1].toLowerCase();
-
-                //getThose"Manys"
-                //get from database
-                QueryBuilder queryBuilder1 = new QueryBuilder(CommandType.SELECT);
-                //class name with orm.test.class
-                //parse
-
-                Query query1 = queryBuilder1.addTable(entityNameToLoad)
-                        .addColumn("id","")
-                        .addCondition(clazz.getSimpleName().toLowerCase() +"_id = " +id)
-                        .build();
-
-
-                CachedRowSet set = executor.execute(query1).orElseThrow(
-                        SQLException::new);
-
-
-
-                //TODO nie obslugujemy hashsetow jakby komus sie zachcialo
+                //TODO: nie obslugujemy hashsetow jakby komus sie zachcialo
                 Collection<Object> container = new ArrayList<>();
                 while (set.next()){
                     Integer ids = set.getInt("id");
-                    ParameterizedType pType = (ParameterizedType) genericFieldType;
+                    ParameterizedType pType = (ParameterizedType) field.getGenericType();
                     Class<?> collectionType = (Class<?>) pType.getActualTypeArguments()[0];
 
-                    container.add(load(collectionType,ids));
+                    container.add(load(collectionType, ids));
                 }
-
-
                 fieldValue = container;
-
-
-            }else if (field.isAnnotationPresent(ManyToOne.class))
-            {
-
+            }
+            else if (field.isAnnotationPresent(ManyToOne.class)) {
                 Integer foreignKey = cachedRowSet.getInt(fieldType.getSimpleName() + "_id");
                 fieldValue = load(fieldType,foreignKey);
-
-            }else{
+            }
+            else {
                 //Only primitive
                 fieldValue = cachedRowSet.getObject(field.getName().toLowerCase());
             }
-
-
-            setField(instance,field,fieldValue);
+            setField(instance, field, fieldValue);
         }
-
-
 
         return instance;
     }
+
 //    private Object OneToOneLoad(Field field,CachedRowSet cachedRowSet) throws SQLException, NoSuchMethodException {
 ////
 ////        OneToOne annotation = field.getAnnotation(OneToOne.class);
@@ -179,28 +129,22 @@ public class Session {
 ////            fieldValue = load(fieldType,idA);
 ////        }
 ////    }
-    private Integer findKey(String tableName,Integer foreignKey,String columName ) throws SQLException {
-        String[] array = columName.split("\\.");
-        columName = array[array.length-1].toLowerCase();
-//        System.out.println("table name: " + tableName);
-//
-//        System.out.println("column name : " + columName);
 
-        QueryBuilder queryBuilder = new QueryBuilder(CommandType.SELECT);
-        Query query = queryBuilder
-                .addTable(tableName)
-                .addColumn("id","")
-                .addCondition(columName + "=" + foreignKey)
-                .build();
+    private Integer findKey(String tableName, Integer foreignKey, String column) throws SQLException {
+        String[] array = column.split("\\.");
+        column = array[array.length-1].toLowerCase();
+
+        Query query = new QueryBuilder(CommandType.SELECT)
+                        .addTable(tableName)
+                        .addColumn("id","")
+                        .addCondition(column + "=" + foreignKey)
+                        .build();
         CachedRowSet set = executor.execute(query).orElseThrow(SQLException::new);
-        if(set.next()) {
+        if (set.next()) {
             return set.getInt(1);
         }
         return null;
-
-
     }
-
 
     public void update(Object object) {
         objectsToUpdate.add(object);
