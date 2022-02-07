@@ -47,7 +47,7 @@ public class SchemaCreator {
     public void addQueryForIdTable(){
         queries.addAll(List.of(
                 new QueryBuilder(CommandType.CREATE).addTable("id").addColumn("id", "INT").build(),
-                new Query("INSERT INTO id (id) VALUES(1);")
+                new QueryBuilder(CommandType.INSERT).addTable("id").addColumn("id", null).addValue(1).build()
         ));
     }
 

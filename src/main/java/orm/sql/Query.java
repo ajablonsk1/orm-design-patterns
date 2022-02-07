@@ -17,17 +17,9 @@ public class Query {
     List<String> setColumns = new ArrayList<>();
     List<String> foreignKeys = new ArrayList<>();
 
-    String customString = null;
-
     public Query(){}
-    public Query(String s) {
-        customString = s;
-    }
 
     public String toString() {
-        if (customString != null){
-            return customString;
-        }
         if (commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
