@@ -49,8 +49,6 @@ public class Session {
         Field[] annotatedFields = classScanner.getAnnotatedFields(clazz).toArray(new Field[0]);
         AccessibleObject.setAccessible(annotatedFields, true);
 
-        Object instance = clazz.getDeclaredConstructor().newInstance();
-
         // wczytaj pola obiektu z bazy danych
         Query query = new QueryBuilder(CommandType.SELECT).addTable(clazz)
                             .addCondition("id = " + id).build();
@@ -59,6 +57,7 @@ public class Session {
         cachedRowSet.next();
 
         // już tutaj wstawiamy do identityMap ze względu na kaskadowe ładowanie
+        Object instance = clazz.getDeclaredConstructor().newInstance();
         identityMap.put(id, instance);
 
         for (Field field: annotatedFields){
