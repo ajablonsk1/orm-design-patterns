@@ -1,7 +1,8 @@
 package orm.session;
 
+import orm.annotations.ManyToOne;
+import orm.annotations.OneToMany;
 import orm.annotations.OneToOne;
-import orm.session.Executor;
 import orm.schema.ClassFinder;
 import orm.schema.ClassScanner;
 import orm.sql.CommandType;
@@ -10,9 +11,7 @@ import orm.sql.Query;
 import orm.sql.QueryBuilder;
 
 import javax.sql.rowset.CachedRowSet;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -44,8 +43,12 @@ public class Session {
     public Object load(Class<?> clazz,Integer id) throws NoSuchMethodException, SQLException {
         //sprawdz czy juz byl wczytany
 
-        if (identityMap.containsKey(id)) return identityMap.get(id);
+        if (identityMap.containsKey(id)){
+            return identityMap.get(id);
+        }
         //wczytaj dane z obiektu
+
+
         QueryBuilder queryBuilder = new QueryBuilder(CommandType.SELECT);
         Query query = queryBuilder.addTable(clazz)
                 .addCondition("id = " + id)
@@ -76,9 +79,10 @@ public class Session {
         cachedRowSet.next();
 
         for (Field field: annotatedFields){
-            //System.out.println(field.getName().toLowerCase());
+
             Class<?> fieldType = field.getType();
             Object fieldValue = null;
+            //System.out.println(fieldType);
 
             //OnetoOne case
             if (field.isAnnotationPresent(OneToOne.class)){
@@ -96,10 +100,55 @@ public class Session {
                 }else{
                     //TODO zmiana nazwy
                     Integer idA = findKey(entityName,id,clazz.toString().toLowerCase()+"_id");
-                    System.out.println(fieldType);
+                    //System.out.println(fieldType);
                     fieldValue = load(fieldType,idA);
                 }
-            }else {
+            }else if (field.isAnnotationPresent(OneToMany.class)) {
+                //tu jest lista generic daje zwraca x List<x>
+                Type genericFieldType = field.getGenericType();
+
+
+                String[] array = genericFieldType.toString().split("[.>]");
+                String entityNameToLoad = array[array.length-1].toLowerCase();
+
+                //getThose"Manys"
+                //get from database
+                QueryBuilder queryBuilder1 = new QueryBuilder(CommandType.SELECT);
+                //class name with orm.test.class
+                //parse
+
+                Query query1 = queryBuilder1.addTable(entityNameToLoad)
+                        .addColumn("id","")
+                        .addCondition(clazz.getSimpleName().toLowerCase() +"_id = " +id)
+                        .build();
+
+
+                CachedRowSet set = executor.execute(query1).orElseThrow(
+                        SQLException::new);
+
+
+
+                //TODO nie obslugujemy hashsetow jakby komus sie zachcialo
+                Collection<Object> container = new ArrayList<>();
+                while (set.next()){
+                    Integer ids = set.getInt("id");
+                    ParameterizedType pType = (ParameterizedType) genericFieldType;
+                    Class<?> collectionType = (Class<?>) pType.getActualTypeArguments()[0];
+
+                    container.add(load(collectionType,ids));
+                }
+
+
+                fieldValue = container;
+
+
+            }else if (field.isAnnotationPresent(ManyToOne.class))
+            {
+
+                Integer foreignKey = cachedRowSet.getInt(fieldType.getSimpleName() + "_id");
+                fieldValue = load(fieldType,foreignKey);
+
+            }else{
                 //Only primitive
                 fieldValue = cachedRowSet.getObject(field.getName().toLowerCase());
             }
@@ -112,12 +161,30 @@ public class Session {
 
         return instance;
     }
+//    private Object OneToOneLoad(Field field,CachedRowSet cachedRowSet) throws SQLException, NoSuchMethodException {
+////
+////        OneToOne annotation = field.getAnnotation(OneToOne.class);
+////        boolean foreignKeyInThisTable = annotation.foreignKeyInThisTable();
+////
+////        Class<?> fieldType = field.getType();
+////        String entityName = fieldType.getSimpleName();
+////
+////        if (foreignKeyInThisTable){
+////            Integer foreignKey = cachedRowSet.getInt(entityName + "_id");
+////            return load(fieldType,foreignKey);
+////        }else{
+////            //TODO zmiana nazwy
+////            Integer idA = findKey(entityName,id,clazz.toString().toLowerCase()+"_id");
+////            //System.out.println(fieldType);
+////            fieldValue = load(fieldType,idA);
+////        }
+////    }
     private Integer findKey(String tableName,Integer foreignKey,String columName ) throws SQLException {
         String[] array = columName.split("\\.");
         columName = array[array.length-1].toLowerCase();
-        System.out.println("table name: " + tableName);
-
-        System.out.println("column name : " + columName);
+//        System.out.println("table name: " + tableName);
+//
+//        System.out.println("column name : " + columName);
 
         QueryBuilder queryBuilder = new QueryBuilder(CommandType.SELECT);
         Query query = queryBuilder
@@ -136,11 +203,11 @@ public class Session {
 
 
     public void update(Object object) {
-        //TODO
+        objectsToUpdate.add(object);
     }
 
     public void delete(Object object) {
-        //TODO
+        objectsToDelete.add(object);
     }
 
     private void insertObjectRecord(Object object){
@@ -160,6 +227,7 @@ public class Session {
 
     private void insertClassRecord(Class clazz, Object object){
         QueryBuilder queryBuilder = new QueryBuilder(CommandType.INSERT);
+        //TODO a to nie wpisze tylko tylko @Column a co z relacjami?
         List<Field> columns = classScanner.getColumns(clazz);
         queryBuilder.addTable(clazz);
         columns.forEach(column -> {
@@ -197,6 +265,8 @@ public class Session {
 
     private void flushDelete() {
         //TODO
+        //config
+
     }
 
     public void flush(){
