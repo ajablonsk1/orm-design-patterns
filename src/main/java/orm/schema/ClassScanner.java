@@ -28,6 +28,17 @@ public class ClassScanner {
     public List<Field> getManyToManyFields(Class cl){
         return getFieldsAnnotatedAs(cl, ManyToMany.class);
     }
+
+    public List<Field> getAnnotatedFields(Class cl) {
+        Set set = new HashSet();
+        set.addAll(getColumns(cl));
+        set.addAll(getOneToOneFields(cl));
+        set.addAll(getOneToManyFields(cl));
+        set.addAll(getManyToOneFields(cl));
+        set.addAll(getManyToManyFields(cl));
+        return set.stream().toList();
+    }
+
     public List<Field> getFieldsAnnotatedAs(Class cl, Class annotation){
         return Arrays.stream(cl.getDeclaredFields())
                 .filter(f -> hasAnnotation(f, annotation))
