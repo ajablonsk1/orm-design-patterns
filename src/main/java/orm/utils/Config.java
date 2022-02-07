@@ -35,12 +35,20 @@ public class Config {
         JsonElement packagesJson = json.getAsJsonObject().get("packages");
         packages = gson.fromJson(packagesJson, ArrayList.class);
 
-        connectionPoolSize = json.getAsJsonObject().get("connection_pool_size").getAsInt();
+        try {
+            connectionPoolSize = json.getAsJsonObject().get("connection_pool_size").getAsInt();
+        } catch (Exception e){
+            connectionPoolSize = 16;
+        }
         user = json.getAsJsonObject().get("user").getAsString();
         password = json.getAsJsonObject().get("password").getAsString();
         databaseUrl = json.getAsJsonObject().get("database_url").getAsString();
         databaseName = json.getAsJsonObject().get("database_name").getAsString();
-        createSchemaOnStart = json.getAsJsonObject().get("create_schema_on_start").getAsBoolean();
+        try {
+            createSchemaOnStart = json.getAsJsonObject().get("create_schema_on_start").getAsBoolean();
+        } catch (Exception e){
+            createSchemaOnStart = true;
+        }
         reader.close();
     }
 

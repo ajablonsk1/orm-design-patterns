@@ -1,9 +1,7 @@
 {
   "packages": ["orm.test"],
-  "connection_pool_size": 4,
   "user": "pmakare1",
   "password": "kmjUCKSydDxdZ022",
   "database_url": "jdbc:mariadb://mysql.agh.edu.pl:3306/pmakare1",
-  "database_name": "pmakare1",
-  "create_schema_on_start": true
+  "database_name": "pmakare1"
 }

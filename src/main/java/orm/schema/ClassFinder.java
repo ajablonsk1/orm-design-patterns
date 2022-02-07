@@ -5,11 +5,7 @@ import orm.utils.Config;
 
 import java.io.*;
 import java.lang.annotation.Annotation;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 public class ClassFinder {
@@ -42,7 +38,7 @@ public class ClassFinder {
                 .filter(line -> line.endsWith(".class"))
                 .map(line -> getClass(line, packageName))
                 .filter(Objects::nonNull)
-                .filter(this::isAnnotated)
+                .filter(this::isEntityClass)
                 .collect(Collectors.toSet());
     }
 
@@ -57,7 +53,7 @@ public class ClassFinder {
     }
 
     // TODO: Uwzględnić pozostałe adnotacje
-    private boolean isAnnotated(Class cl) {
+    private boolean isEntityClass(Class cl) {
         Annotation[] annotations = cl.getAnnotationsByType(Entity.class);
         return annotations.length != 0;
     }
