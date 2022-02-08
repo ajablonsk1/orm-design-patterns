@@ -76,7 +76,7 @@ public class Session {
 
     private void insertObjectRecord(Object object){
         QueryBuilder queryBuilder = new QueryBuilder(CommandType.INSERT);
-        List<Field> columns = classScanner.getColumns(object.getClass());
+        List<Field> columns = classScanner.getAnnotatedFields(object.getClass());
         queryBuilder.addTable(object.getClass());
         columns.forEach(column -> {
             try {
@@ -91,8 +91,7 @@ public class Session {
 
     private void insertClassRecord(Class clazz, Object object){
         QueryBuilder queryBuilder = new QueryBuilder(CommandType.INSERT);
-        //TODO a to nie wpisze tylko tylko @Column a co z relacjami?
-        List<Field> columns = classScanner.getColumns(clazz);
+        List<Field> columns = classScanner.getAnnotatedFields(clazz);
         queryBuilder.addTable(clazz);
         columns.forEach(column -> {
             try {

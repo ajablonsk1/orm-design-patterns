@@ -1,15 +1,8 @@
 package orm.schema;
 
 import orm.annotations.*;
-import orm.session.Executor;
-import orm.sql.CommandType;
-import orm.sql.Query;
-import orm.sql.QueryBuilder;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.*;
 
 public class ClassScanner {
@@ -30,19 +23,14 @@ public class ClassScanner {
     }
 
     public List<Field> getAnnotatedFields(Class cl) {
-        Set set = new HashSet();
-        set.addAll(getColumns(cl));
-        set.addAll(getOneToOneFields(cl));
-        set.addAll(getOneToManyFields(cl));
-        set.addAll(getManyToOneFields(cl));
-        set.addAll(getManyToManyFields(cl));
-        set.addAll(getFieldsAnnotatedAs(cl, Id.class));
-        return set.stream().toList();
+        return Arrays.stream(cl.getDeclaredFields())
+                .filter(this::hasAnnotation)
+                .toList();
     }
 
     public List<Field> getFieldsAnnotatedAs(Class cl, Class annotation){
         return Arrays.stream(cl.getDeclaredFields())
-                .filter(f -> hasAnnotation(f, annotation))
+                .filter(f -> hasSpecificAnnotation(f, annotation))
                 .toList();
     }
     public List<Class> getParentEntityClasses(Class cl){
@@ -61,9 +49,13 @@ public class ClassScanner {
         else return null;
     }
 
-    private boolean hasAnnotation(Field field, Class annotation){
+    private boolean hasSpecificAnnotation(Field field, Class annotation){
         return Arrays.stream(field.getAnnotations())
                 .anyMatch(a -> a.annotationType() == annotation);
+    }
+
+    private boolean hasAnnotation(Field field){
+        return !Arrays.asList(field.getAnnotations()).isEmpty();
     }
 
     private boolean isEntity(Class cl){
