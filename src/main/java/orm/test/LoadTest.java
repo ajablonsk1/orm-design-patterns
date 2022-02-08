@@ -7,13 +7,9 @@ import orm.annotations.OneToOne;
 
 @Entity
 public class LoadTest {
-    @Column
-    String firstName;
-    @Column String lastName;
     @Id
     int id;
     @OneToOne(foreignKeyInThisTable = true) Student student;
-
 
     public Student getStudent() {
         return student;
@@ -25,22 +21,6 @@ public class LoadTest {
 
     public LoadTest(){
 
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public int getId() {

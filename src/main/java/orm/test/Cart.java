@@ -11,6 +11,7 @@ import java.util.List;
 public class Cart {
 
     @Id int id;
+
     @OneToMany
     List<Item> items = new ArrayList<>();
 

@@ -36,6 +36,7 @@ public class ClassScanner {
         set.addAll(getOneToManyFields(cl));
         set.addAll(getManyToOneFields(cl));
         set.addAll(getManyToManyFields(cl));
+        set.addAll(getFieldsAnnotatedAs(cl, Id.class));
         return set.stream().toList();
     }
 
@@ -52,6 +53,12 @@ public class ClassScanner {
             return classes;
         }
         return new ArrayList<>();
+    }
+    public Class getParentEntityClass(Class cl){
+        Class superclass = cl.getSuperclass();
+        if (isEntity(superclass))
+            return superclass;
+        else return null;
     }
 
     private boolean hasAnnotation(Field field, Class annotation){

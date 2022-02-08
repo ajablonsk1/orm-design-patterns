@@ -2,9 +2,13 @@ package orm.test;
 
 import orm.annotations.Column;
 import orm.annotations.Entity;
+import orm.annotations.Id;
 
 @Entity
 public class Person {
+    @Id
+    public Integer id;
+
     @Column
     public String firstName;
     @Column

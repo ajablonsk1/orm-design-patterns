@@ -7,24 +7,18 @@ import java.util.List;
 
 @Entity
 public class Student{
+    @Id public Integer id;
+
     @Column public String firstName;
     @Column public String lastName;
     @OneToOne(foreignKeyInThisTable = true) public Account account;
     @OneToMany public List<Grade> grades;
 
-    @ManyToMany(tableName = "professorstudents", columnName = "professor_id")
-    List<Professor> professors = new ArrayList<>();
 
     LoadTest loadTestForPrimitive;
 
     public Student() {
     }
-
-    public void addProfessor(Professor e){
-        professors.add(e);
-    }
-
-
     public String getFirstName() {
         return firstName;
     }
