@@ -52,13 +52,28 @@ public class Session {
 
     private void insertRecord(Class<?> clazz, Object object){
         QueryBuilder qb = new QueryBuilder(CommandType.INSERT);
-        qb.addTable(clazz);
-
         try {
-            for (Field column : classScanner.getAnnotatedFields(clazz)) {
+            qb.addTable(clazz);
+            qb.addColumn("id", "").addValue(getObjectId(object));
+            for (Field column : classScanner.getColumns(clazz)) {
                 qb.addColumn(column).addValue(column.get(object));
             }
-            qb.addColumn("id", "INT").addValue(getObjectId(object));
+
+            for (Field field : classScanner.getOneToOneFields(clazz)) {
+                if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
+                    String columnName = field.getName() + "_id";
+                    qb.addColumn(columnName, null);
+                    qb.addValue(getObjectId(field.get(object)));
+                }
+            }
+
+            for (Field field : classScanner.getManyToOneFields(clazz)) {
+                String[] a = field.getType().toString().split("\\.");
+                String columnName = a[a.length - 1].toLowerCase() + "_id";
+                qb.addColumn(columnName, null);
+                qb.addValue(getObjectId(field.get(object)));
+            }
+
         } catch (IllegalAccessException e){
             e.printStackTrace();
         }
@@ -97,21 +112,7 @@ public class Session {
                         .addValue(column.get(object));
             }
 
-            for (Field field : classScanner.getOneToOneFields(cl)) {
-                if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
-                    String[] a = field.getType().toString().split("\\.");
-                    String columnName = a[a.length - 1].toLowerCase();
-                    qb.addColumn(columnName, null);
-                    qb.addValue(field.get(object));
-                }
-            }
 
-            for (Field field : classScanner.getManyToOneFields(cl)) {
-                String[] a = field.getType().toString().split("\\.");
-                String columnName = a[a.length - 1].toLowerCase();
-                qb.addColumn(columnName, null);
-                qb.addValue(field.get(object));
-            }
             executor.execute(qb.build());
 
             // update Many-to-Many
@@ -119,8 +120,10 @@ public class Session {
             for (Field field : classScanner.getManyToManyFields(cl)){
                 String tableName = field.getAnnotation(ManyToMany.class).tableName();
 
-                // TODO zamiast getClass powinno być wzięcie wewnętrznej klasy
-                String thisColumnName = classScanner.getManyToManyFields(field.getClass())
+                // TODO wyciągnąć do zewnętrznej metody i sprawdzić czy działa w teście jednostkowym
+                Class<?> otherClass = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+
+                String thisColumnName = classScanner.getManyToManyFields(otherClass)
                                             .stream()
                                             .filter(f -> f.getAnnotation(ManyToMany.class).tableName() == tableName)
                                             .reduce((first, second) -> first)

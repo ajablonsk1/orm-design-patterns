@@ -19,15 +19,12 @@ public class IdGiver {
         Query query = queryBuilder.addColumn("id", "")
                 .addTable("id")
                 .build();
-        Optional<CachedRowSet> crs = executor.execute(query);
-        if(crs.isPresent()){
-            int id = crs.get().getInt(1);
-            updateId(id);
-            return id;
-        }
-        else{
-            throw new IllegalStateException("Cannot take id record");
-        }
+        CachedRowSet crs = executor.execute(query)
+                .orElseThrow(SQLException::new);
+        crs.next();
+        int id = crs.getInt(1);
+        updateId(id);
+        return id;
     }
 
     private void updateId(Integer id) {

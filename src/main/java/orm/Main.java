@@ -1,6 +1,7 @@
 package orm;
 
 
+import orm.annotations.ManyToOne;
 import orm.schema.SchemaCreator;
 import orm.session.Session;
 import orm.session.SessionFactory;
@@ -12,34 +13,24 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws Exception {
         Session session = SessionFactory.getInstance().createSession();
-        Teacher teacher = (Teacher) session.load(Teacher.class,1);
-        System.out.println(teacher.subject.subjectName);
-        System.out.println(teacher.firstName);
-        System.out.println(teacher.lastName);
+
+        SimpleClass sc = new SimpleClass();
+        OneToManyCl oneToManyCl = new OneToManyCl();
+        OneToOneCl oneToOneCl = new OneToOneCl();
+
+        sc.oneToMany = oneToManyCl;
+        oneToManyCl.sc = sc;
+
+        sc.oneToOne = oneToOneCl;
+        oneToOneCl.sc =sc;
+
+        session.save(sc);
+        session.save(oneToManyCl);
+        session.save(oneToOneCl);
+
+        session.flush();
 
 
-//        Account account = new Account();
-//        account.setUserName("misiek2000");
-//        account.setPassword("super-tajne-haslo");
-//
-//        Student student = new Student();
-//        student.setFirstName("Michał");
-//        student.setLastName("Studencki");
-//
-//        student.setAccount(account);
-//        account.setStudent(student);
-//
-//        Professor professor = new Professor();
-//        professor.setFirstName("Jan");
-//        professor.setLastName("Profesorski");
-//
-//        professor.addStudent(student);
-//        student.addProfessor(professor);
-//
-//        session.save(student);
-//        session.save(professor);
-//        session.save(account);
-//        session.flush();
 
     }
 }

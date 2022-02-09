@@ -3,7 +3,6 @@ package orm.schema;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import orm.annotations.*;
-import orm.test.Cart;
 
 import java.lang.reflect.Field;
 import java.util.List;
