@@ -10,14 +10,7 @@ public class SimpleClass {
     @Id
     public int id;
 
-    @Column
-    public String cos;
-
-    @OneToOne(foreignKeyInThisTable = false)
-    public OneToOneCl oneToOne;
-
-    @OneToMany
-    public List<OneToManyCl> oneToMany;
-
+    @ManyToMany(tableName = "tabelaLacznikowa")
+    public List<ManyToManyCl> scs;
 
 }

@@ -15,46 +15,17 @@ public class Main {
         Session session = SessionFactory.getInstance().createSession();
 
         SimpleClass sc = new SimpleClass();
-        sc.cos = "@$#@$";
 
-        OneToManyCl oneToManyCl = new OneToManyCl();
-        OneToOneCl oneToOneCl = new OneToOneCl();
+        ManyToManyCl mtm = new ManyToManyCl();
 
-        sc.oneToMany = new ArrayList<>();
-        sc.oneToMany.add(oneToManyCl);
-        oneToManyCl.sc = sc;
+        sc.scs = new ArrayList<>(List.of(mtm));
 
-        sc.oneToOne = oneToOneCl;
-        oneToOneCl.sc =sc;
+        mtm.scs = new ArrayList<>(List.of(sc));
 
         session.save(sc);
-        session.save(oneToManyCl);
-        session.save(oneToOneCl);
-
-        OneToManyCl someNewOneToManyCl = new OneToManyCl();
-        someNewOneToManyCl.sc = sc;
-
-        session.save(someNewOneToManyCl);
+        session.save(mtm);
 
         session.flush();
-
-        SimpleClass sc2 = new SimpleClass();
-
-        sc2.cos = "lubie placki";
-        sc2.oneToMany = new ArrayList<>();
-        sc2.oneToOne = oneToOneCl;
-
-        oneToOneCl.sc = sc2;
-
-        session.save(sc2);
-        session.update(oneToOneCl);
-
-        sc.cos = "Haha, xd";
-        sc.oneToMany.add(someNewOneToManyCl);
-        session.update(sc);
-
-        session.flush();
-
 
 
     }

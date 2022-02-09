@@ -9,6 +9,7 @@ import orm.sql.Query;
 import orm.sql.QueryBuilder;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -94,7 +95,14 @@ public class SchemaCreator {
                 } else{
                     qb.setCommandType(CommandType.ALTER);
                 }
-                qb.addTable(associationTable).addForeignKey(field);
+                qb.addTable(associationTable);
+
+                String refTableName = ((Class<?>) ((ParameterizedType) field.getGenericType())
+                                            .getActualTypeArguments()[0]).getSimpleName().toLowerCase();
+                String columnName = refTableName + "_id";
+
+                qb.addForeignKey(columnName, refTableName);
+
                 queries.add(qb.build());
             }
         }
