@@ -8,8 +8,11 @@ import orm.sql.IdGiver;
 import orm.sql.Query;
 import orm.sql.QueryBuilder;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -118,10 +121,18 @@ public class ObjectSaver {
     }
 
     private void setObjectId(Object object, int id) throws IllegalAccessException {
-        classScanner.getIdField(object.getClass()).set(object, id);
+        Field idField = classScanner.getIdField(object.getClass());
+        Field[] arr = new Field[1];
+        arr[0] = idField;
+        AccessibleObject.setAccessible(arr, true);
+        idField.set(object, id);
     }
 
     private int getObjectId(Object object) throws IllegalAccessException {
-        return (int) classScanner.getIdField(object.getClass()).get(object);
+        Field idField = classScanner.getIdField(object.getClass());
+        Field[] arr = new Field[1];
+        arr[0] = idField;
+        AccessibleObject.setAccessible(arr, true);
+        return (int) idField.get(object);
     }
 }
