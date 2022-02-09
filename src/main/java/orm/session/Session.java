@@ -1,5 +1,6 @@
 package orm.session;
 
+import orm.annotations.ManyToMany;
 import orm.annotations.OneToOne;
 import orm.schema.ClassFinder;
 import orm.schema.ClassScanner;
@@ -8,6 +9,7 @@ import orm.sql.IdGiver;
 import orm.sql.Query;
 import orm.sql.QueryBuilder;
 
+import java.io.FileReader;
 import java.lang.reflect.*;
 import java.sql.SQLException;
 import java.util.*;
@@ -86,9 +88,10 @@ public class Session {
     }
 
     private void updateRecord(Class<?> cl, Object object) {
-        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-        qb.addTable(cl);
         try {
+            QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+            qb.addTable(cl);
+
             for (Field column : classScanner.getColumns(cl)) {
                 qb.addColumn(column)
                         .addValue(column.get(object));
@@ -109,10 +112,39 @@ public class Session {
                 qb.addColumn(columnName, null);
                 qb.addValue(field.get(object));
             }
+            executor.execute(qb.build());
+
+            // update Many-to-Many
+
+            for (Field field : classScanner.getManyToManyFields(cl)){
+                String tableName = field.getAnnotation(ManyToMany.class).tableName();
+
+                // TODO zamiast getClass powinno być wzięcie wewnętrznej klasy
+                String thisColumnName = classScanner.getManyToManyFields(field.getClass())
+                                            .stream()
+                                            .filter(f -> f.getAnnotation(ManyToMany.class).tableName() == tableName)
+                                            .reduce((first, second) -> first)
+                                            .get()
+                                            .getName().toLowerCase() + "_id";
+
+                String otherColumnName = field.getName().toLowerCase() + "_id";
+
+                // select from association table
+                QueryBuilder qb2 = new QueryBuilder(CommandType.SELECT);
+                qb2.addTable(tableName)
+                        .addColumn(thisColumnName, "")
+                        .addColumn(otherColumnName, "");
+
+                // find records to insert
+
+                // find records to delete
+            }
+
 
         } catch (IllegalAccessException e){
             e.printStackTrace();
         }
+
     }
 
     private void flushUpdate() {
@@ -122,13 +154,12 @@ public class Session {
                 updateRecord(clazz, object);
         }
         // TODO przy OneToMany update powinien dziać się z drugiej strony?
-        // TODO ManyToMany
     }
 
     private void flushDelete() {
-        //TODO
-        //config
 
+
+        // TODO
     }
 
     public void flush(){
