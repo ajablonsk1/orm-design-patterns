@@ -131,8 +131,6 @@ public class Session {
     }
 
     private void flushDelete() {
-        //TODO
-        //config
         List<Query> queries = new ArrayList<>();
         try {
             for (Object obj : objectsToDelete) {
@@ -141,6 +139,7 @@ public class Session {
                 identityMap.remove(id);
 
                 for (Field field : classScanner.getOneToOneFields(cl)) {
+                    field.setAccessible(true);
                     Object fieldValue = field.get(obj);
                     if (fieldValue == null)
                         continue;
@@ -153,6 +152,7 @@ public class Session {
                         queries.add(qb.build());
                     } else {
                         for (Field field1 : classScanner.getOneToOneFields(fieldValue.getClass())) {
+                            field1.setAccessible(true);
                             if (field1.getAnnotation(OneToOne.class).foreignKeyInThisTable() && id == getObjectId(field1.get(fieldValue))) {
                                 QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
                                 qb.addTable(fieldValue.getClass());
@@ -160,35 +160,41 @@ public class Session {
                                 qb.addCondition("id = " + fieldId);
                                 queries.add(qb.build());
                             }
+                            field1.setAccessible(false);
                         }
                     }
+                    field.setAccessible(false);
                 }
 
                 for (Field field : classScanner.getOneToManyFields(cl)) {
+                    field.setAccessible(true);
                     Collection collection = (Collection) field.get(obj);
                     if (collection == null)
                         continue;
                     for (Object fieldValue : collection) {
-                        System.out.println(fieldValue.getClass());
                         int fieldId = getObjectId(fieldValue);
                         QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
                         qb.addTable(fieldValue.getClass());
                         String columnName = null;
                         for (Field field1 : classScanner.getManyToOneFields(fieldValue.getClass())) {
+                            field1.setAccessible(true);
                             Object field1Value = field1.get(fieldValue);
                             if (field1Value == null)
                                 continue;
                             if (id == getObjectId(field1Value)) {
                                 columnName = field1.getName().toLowerCase() + "_id";
                             }
+                            field1.setAccessible(false);
                         }
                         qb.setColumn(columnName, null);
                         qb.addCondition("id = " + fieldId);
                         queries.add(qb.build());
                     }
+                    field.setAccessible(false);
                 }
 
                 for (Field field : classScanner.getManyToOneFields(cl)) {
+                    field.setAccessible(true);
                     Object fieldValue = field.get(obj);
                     if (fieldValue == null)
                         continue;
@@ -198,9 +204,11 @@ public class Session {
                     qb.setColumn(field.getName().toLowerCase()+"_id", null);
                     qb.addCondition("id = " + id);
                     queries.add(qb.build());
+                    field.setAccessible(false);
                 }
 
-                for (Field field : classScanner.getManyToOneFields(cl)) {
+                for (Field field : classScanner.getManyToManyFields(cl)) {
+                    field.setAccessible(true);
                     Object fieldValue = field.get(obj);
                     if (fieldValue == null)
                         continue;
@@ -211,6 +219,7 @@ public class Session {
                     qb.addCondition(cl.getSimpleName().toLowerCase() +"_id" + " = " + id);
                     qb.addCondition(fieldValue.getClass().getSimpleName().toLowerCase() +"_id" + " = " + fieldId);
                     queries.add(qb.build());
+                    field.setAccessible(false);
                 }
 
                 for (Class parent : classScanner.getParentEntityClasses(cl)) {

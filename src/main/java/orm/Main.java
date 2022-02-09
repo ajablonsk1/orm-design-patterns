@@ -19,17 +19,21 @@ public class Main {
 
         OneToManyCl oneToManyCl = new OneToManyCl();
         OneToOneCl oneToOneCl = new OneToOneCl();
+        OneToOneCl2 oneToOneCl2 = new OneToOneCl2();
 
         sc.oneToMany = new ArrayList<>();
         sc.oneToMany.add(oneToManyCl);
         oneToManyCl.sc = sc;
 
         sc.oneToOne = oneToOneCl;
+        sc.oneToOne2 = oneToOneCl2;
         oneToOneCl.sc =sc;
+        oneToOneCl2.sc = sc;
 
         session.save(sc);
         session.save(oneToManyCl);
         session.save(oneToOneCl);
+        session.save(oneToOneCl2);
 
         OneToManyCl someNewOneToManyCl = new OneToManyCl();
         someNewOneToManyCl.sc = sc;
@@ -38,32 +42,32 @@ public class Main {
 
         session.flush();
 
-        SimpleClass sc2 = new SimpleClass();
-
-        sc2.cos = "lubie placki";
-        sc2.oneToMany = new ArrayList<>();
-        sc2.oneToOne = oneToOneCl;
-
-        oneToOneCl.sc = sc2;
-
-        session.save(sc2);
-        session.update(oneToOneCl);
-
+//        SimpleClass sc2 = new SimpleClass();
+//
+//        sc2.cos = "lubie placki";
+//        sc2.oneToMany = new ArrayList<>();
+//        sc2.oneToOne = oneToOneCl;
+//
+//        oneToOneCl.sc = sc2;
+//
+//        session.save(sc2);
+//        session.update(oneToOneCl);
+//
         sc.cos = "Haha, xd";
         sc.oneToMany.add(someNewOneToManyCl);
         session.update(sc);
 
         session.flush();
-
+//
         InheritingClass inheritingClass = new InheritingClass();
         inheritingClass.cos = "sgsgs";
         inheritingClass.name = "qweryterw";
-        session.save(inheritingClass);
-        session.flush();
-        session.delete(inheritingClass);
-        session.flush();
+//        session.save(inheritingClass);
+//        session.flush();
+//        session.delete(inheritingClass);
+//        session.flush();
         session.delete(sc);
-        session.delete(sc2);
+        //session.delete(sc2);
         session.flush();
 
     }
