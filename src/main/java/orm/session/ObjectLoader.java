@@ -108,15 +108,19 @@ public class ObjectLoader {
         return fieldValue;
     }
 
-    private Object getOneToOneFieldValue(Class<?> clazz, Integer id, CachedRowSet cachedRowSet, Field field, Class<?> fieldType) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        Object fieldValue;
-        String[] a = fieldType.toString().split("\\.");
-        String entityName = a[a.length-1].toLowerCase();
+    private Object getOneToOneFieldValue(Class<?> clazz, Integer id, CachedRowSet cachedRowSet, Field field, Class<?> fieldType) {
+        Object fieldValue = null;
+        try {
+            String[] a = fieldType.toString().split("\\.");
+            String entityName = a[a.length - 1].toLowerCase();
 
-        Integer otherId = field.getAnnotation(OneToOne.class).foreignKeyInThisTable()
-                ? cachedRowSet.getInt(entityName + "_id")
-                : findKey(entityName, id, clazz.toString().toLowerCase()+"_id");
-        fieldValue = load(fieldType, otherId);
+            Integer otherId = field.getAnnotation(OneToOne.class).foreignKeyInThisTable()
+                    ? cachedRowSet.getInt(entityName + "_id")
+                    : findKey(entityName, id, clazz.toString().toLowerCase() + "_id");
+            fieldValue = load(fieldType, otherId);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         return fieldValue;
     }
 

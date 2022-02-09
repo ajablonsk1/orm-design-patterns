@@ -1,5 +1,6 @@
 package orm.session;
 
+import orm.annotations.OneToOne;
 import orm.schema.ClassFinder;
 import orm.schema.ClassScanner;
 import orm.sql.CommandType;
@@ -84,8 +85,44 @@ public class Session {
         }
     }
 
+    private void updateRecord(Class<?> cl, Object object) {
+        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+        qb.addTable(cl);
+        try {
+            for (Field column : classScanner.getColumns(cl)) {
+                qb.addColumn(column)
+                        .addValue(column.get(object));
+            }
+
+            for (Field field : classScanner.getOneToOneFields(cl)) {
+                if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
+                    String[] a = field.getType().toString().split("\\.");
+                    String columnName = a[a.length - 1].toLowerCase();
+                    qb.addColumn(columnName, null);
+                    qb.addValue(field.get(object));
+                }
+            }
+
+            for (Field field : classScanner.getManyToOneFields(cl)) {
+                String[] a = field.getType().toString().split("\\.");
+                String columnName = a[a.length - 1].toLowerCase();
+                qb.addColumn(columnName, null);
+                qb.addValue(field.get(object));
+            }
+
+        } catch (IllegalAccessException e){
+            e.printStackTrace();
+        }
+    }
+
     private void flushUpdate() {
-        //TODO
+        for (Object object : objectsToUpdate){
+            updateRecord(object.getClass(), object);
+            for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass()))
+                updateRecord(clazz, object);
+        }
+        // TODO przy OneToMany update powinien dziać się z drugiej strony?
+        // TODO ManyToMany
     }
 
     private void flushDelete() {
