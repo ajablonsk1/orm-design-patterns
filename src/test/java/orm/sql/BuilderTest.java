@@ -16,6 +16,7 @@ public class BuilderTest {
                 .addTable("table1")
                 .addColumn("column1", "int")
                 .addColumn("column2", "varchar(50)")
+                .addId()
                 .build();
         String s1 = query.toString();
         String s2 = "CREATE TABLE table1 (column1 int, column2 varchar(50), id INT NOT NULL AUTO_INCREMENT PRIMARY KEY);";

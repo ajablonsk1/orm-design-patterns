@@ -11,6 +11,5 @@ public class ConfigTest {
         Config config = Config.getInstance();
         assertNotNull(config);
         assertNotNull(config.getPackages());
-        assertNotNull(config.getConnectionPoolSize());
     }
 }
