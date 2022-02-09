@@ -130,11 +130,81 @@ public class Session {
     }
 
     private void flushDelete() {
-        for(Object object: objectsToDelete){
+        //TODO
+        //config
+        List<Query> queries = new ArrayList<>();
+        try {
+            for (Object obj : objectsToDelete) {
+                Class cl = obj.getClass();
+                int id = getObjectId(obj);
+                identityMap.remove(id);
 
+                for (Field field : classScanner.getOneToOneFields(cl)) {
+                    Object fieldValue = field.get(obj);
+                    int fieldId = getObjectId(field);
+                    if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
+                        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                        qb.addTable(cl);
+                        qb.setColumn(field.getName().toLowerCase()+"_id", null);
+                        qb.addCondition("id = " + id);
+                        queries.add(qb.build());
+                    } else {
+                        for (Field field1 : classScanner.getOneToOneFields(fieldValue.getClass())) {
+                            if (field1.getAnnotation(OneToOne.class).foreignKeyInThisTable() && id == getObjectId(field1.get(fieldValue))) {
+                                QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                                qb.addTable(fieldValue.getClass());
+                                qb.setColumn(field1.getName().toLowerCase()+"_id", null);
+                                qb.addCondition("id = " + fieldId);
+                                queries.add(qb.build());
+                            }
+                        }
+                    }
+                }
+
+                for (Field field : classScanner.getOneToManyFields(cl)) {
+                    Object fieldValue = field.get(obj);
+                    int fieldId = getObjectId(field);
+                    QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                    qb.addTable(fieldValue.getClass());
+                    String columnName = null;
+                    for (Field field1 : classScanner.getManyToOneFields(fieldValue.getClass())) {
+                        if (id == getObjectId(field1.get(fieldValue))) {
+                            columnName = field1.getName().toLowerCase() + "_id";
+                        }
+                    }
+                    qb.setColumn(columnName, null);
+                    qb.addCondition("id = " + fieldId);
+                    queries.add(qb.build());
+                }
+
+                for (Field field : classScanner.getManyToOneFields(cl)) {
+                    Object fieldValue = field.get(obj);
+                    int fieldId = getObjectId(field);
+                    QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                    qb.addTable(cl);
+                    qb.setColumn(field.getName().toLowerCase()+"_id", null);
+                    qb.addCondition("id = " + id);
+                    queries.add(qb.build());
+                }
+
+                for (Field field : classScanner.getOneToManyFields(cl)) {
+                    Object fieldValue = field.get(obj);
+                    int fieldId = getObjectId(field);
+                    String tableName = field.getAnnotation(ManyToMany.class).tableName();
+                    QueryBuilder qb = new QueryBuilder(CommandType.DELETE);
+                    qb.addTable(cl);
+                    qb.addCondition(cl.getName().toLowerCase() +"_id" + " = " + id);
+                    qb.addCondition(fieldValue.getClass().getName().toLowerCase() +"_id" + " = " + fieldId);
+                    queries.add(qb.build());
+                }
+
+                for (Class parent : classScanner.getParentEntityClasses(cl)) {
+
+                }
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
-
-        // TODO
     }
 
     public void flush(){
