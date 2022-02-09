@@ -2,7 +2,7 @@
   "packages": ["orm.test"],
   "user": "admin",
   "password": "password",
-  "database_url": "jdbc:mariadb://localhost:3306/pholowi1",
+  "database_url": "jdbc:mysql://localhost:3306/pholowi1",
   "database_name": "pholowi1",
-  "create_schema_on_start": false
+  "create_schema_on_start": true
 }

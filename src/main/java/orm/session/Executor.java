@@ -31,13 +31,14 @@ public class Executor {
 
     private Optional<CachedRowSet> executeSingleQuery(Query query) {
         Optional<CachedRowSet> result = Optional.empty();
+        System.out.println("Executing: "+query);
         Connection conn = getConnection();
         try (PreparedStatement statement = conn.prepareStatement(query.toString(), PreparedStatement.RETURN_GENERATED_KEYS)) {
             List<Object> values = query.getValues();
             for (int i = 0; i < values.size(); i++) {
                 statement.setObject(i+1, values.get(i));
             }
-            System.out.println("Executing: "+query);
+
             boolean hasResults = statement.execute();
             if (hasResults) {
                 CachedRowSet rowSet = cacheAndClose(statement.getResultSet());

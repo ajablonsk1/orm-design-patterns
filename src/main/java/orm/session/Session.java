@@ -63,15 +63,16 @@ public class Session {
                 if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
                     String columnName = field.getName() + "_id";
                     qb.addColumn(columnName, null);
-                    qb.addValue(getObjectId(field.get(object)));
+                    qb.addValue(null);
+                    //qb.addValue(getObjectId(field.get(object)));
                 }
             }
 
             for (Field field : classScanner.getManyToOneFields(clazz)) {
-                String[] a = field.getType().toString().split("\\.");
-                String columnName = a[a.length - 1].toLowerCase() + "_id";
+                String columnName = field.getName() + "_id";
                 qb.addColumn(columnName, null);
-                qb.addValue(getObjectId(field.get(object)));
+                qb.addValue(null);
+                //qb.addValue(getObjectId(field.get(object)));
             }
 
         } catch (IllegalAccessException e){
@@ -81,6 +82,37 @@ public class Session {
         Query query = qb.build();
         executor.execute(query);
     }
+
+    private void setForeignKeys(Class<?> cl, Object object) {
+        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+
+        try {
+            for (Field field : classScanner.getOneToOneFields(cl)) {
+                if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
+                    qb = new QueryBuilder(CommandType.UPDATE);
+                    qb.addTable(cl);
+                    String columnName = field.getName() + "_id";
+                    qb.setColumn(columnName, getObjectId(field.get(object)));
+                    qb.addCondition("id = " + getObjectId(object));
+                    executor.execute(qb.build());
+                }
+            }
+
+            for (Field field : classScanner.getManyToOneFields(cl)) {
+                qb = new QueryBuilder(CommandType.UPDATE);
+                qb.addTable(cl);
+                String columnName = field.getName() + "_id";
+                qb.setColumn(columnName, getObjectId(field.get(object)));
+                qb.addCondition("id = " + getObjectId(object));
+                executor.execute(qb.build());
+            }
+
+        } catch (IllegalAccessException e){
+            e.printStackTrace();
+        }
+
+    }
+
 
     private void flushSave() {
         for (Object object: objectsToSave){
@@ -100,48 +132,76 @@ public class Session {
             for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass()))
                 insertRecord(clazz, object);
         }
+
+        for (Object object: objectsToSave) {
+            setForeignKeys(object.getClass(), object);
+            for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass()))
+                setForeignKeys(clazz, object);
+        }
     }
+
+
 
     private void updateRecord(Class<?> cl, Object object) {
         try {
-            QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-            qb.addTable(cl);
+            if (! classScanner.getColumns(cl).isEmpty()) {
+                QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                qb.addTable(cl);
 
-            for (Field column : classScanner.getColumns(cl)) {
-                qb.addColumn(column)
-                        .addValue(column.get(object));
+                for (Field column : classScanner.getColumns(cl)) {
+                    qb.setColumn(column, column.get(object));
+                    qb.addCondition("id = " + getObjectId(object));
+                }
+                executor.execute(qb.build());
             }
 
+            for (Field field : classScanner.getOneToOneFields(cl)) {
+                if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
+                    QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                    qb.addTable(cl);
+                    String columnName = field.getName() + "_id";
+                    qb.setColumn(columnName, getObjectId(field.get(object)));
+                    qb.addCondition("id = " + getObjectId(object));
+                    executor.execute(qb.build());
+                }
+            }
 
-            executor.execute(qb.build());
+            for (Field field : classScanner.getManyToOneFields(cl)) {
+                QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                qb.addTable(cl);
+                String columnName = field.getName() + "_id";
+                qb.setColumn(columnName, getObjectId(field.get(object)));
+                qb.addCondition("id = " + getObjectId(object));
+                executor.execute(qb.build());
+            }
 
             // update Many-to-Many
 
-            for (Field field : classScanner.getManyToManyFields(cl)){
-                String tableName = field.getAnnotation(ManyToMany.class).tableName();
-
-                // TODO wyciągnąć do zewnętrznej metody i sprawdzić czy działa w teście jednostkowym
-                Class<?> otherClass = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-
-                String thisColumnName = classScanner.getManyToManyFields(otherClass)
-                                            .stream()
-                                            .filter(f -> f.getAnnotation(ManyToMany.class).tableName() == tableName)
-                                            .reduce((first, second) -> first)
-                                            .get()
-                                            .getName().toLowerCase() + "_id";
-
-                String otherColumnName = field.getName().toLowerCase() + "_id";
-
-                // select from association table
-                QueryBuilder qb2 = new QueryBuilder(CommandType.SELECT);
-                qb2.addTable(tableName)
-                        .addColumn(thisColumnName, "")
-                        .addColumn(otherColumnName, "");
+//            for (Field field : classScanner.getManyToManyFields(cl)){
+//                String tableName = field.getAnnotation(ManyToMany.class).tableName();
+//
+//                // TODO wyciągnąć do zewnętrznej metody i sprawdzić czy działa w teście jednostkowym
+//                Class<?> otherClass = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+//
+//                String thisColumnName = classScanner.getManyToManyFields(otherClass)
+//                                            .stream()
+//                                            .filter(f -> f.getAnnotation(ManyToMany.class).tableName() == tableName)
+//                                            .reduce((first, second) -> first)
+//                                            .get()
+//                                            .getName().toLowerCase() + "_id";
+//
+//                String otherColumnName = field.getName().toLowerCase() + "_id";
+//
+//                // select from association table
+//                QueryBuilder qb2 = new QueryBuilder(CommandType.SELECT);
+//                qb2.addTable(tableName)
+//                        .addColumn(thisColumnName, "")
+//                        .addColumn(otherColumnName, "");
 
                 // find records to insert
 
                 // find records to delete
-            }
+           // }
 
 
         } catch (IllegalAccessException e){
@@ -171,6 +231,10 @@ public class Session {
         flushSave();
         flushUpdate();
         flushDelete();
+
+        objectsToSave = new HashSet<>();
+        objectsToDelete = new HashSet<>();
+        objectsToUpdate = new HashSet<>();
     }
 
     private void setObjectId(Object object, int id) throws IllegalAccessException {
