@@ -6,14 +6,15 @@ import orm.utils.Config;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ConnectionPool {
     private final int size;
-    private final Connection[] connections;
-    private boolean[] used;
+    private final Deque<Connection> connections;
+    private HashMap<Thread, Connection> used;
     private final Lock lock = new ReentrantLock(true);
     private final Condition condition = lock.newCondition();
     private int lastFree = 0;
@@ -23,14 +24,13 @@ public class ConnectionPool {
     public ConnectionPool() throws Exception {
         Config config = Config.getInstance();
         this.size = config.getConnectionPoolSize();
-        this.connections = new Connection[size];
-        this.used = new boolean[size];
+        this.connections = new ArrayDeque<>(size);
+        this.used = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
-            connections[i] = DriverManager.getConnection(
+            connections.add(DriverManager.getConnection(
                     config.getDatabaseUrl(),
                     config.getUser(),
-                    config.getPassword());
-            used[i] = false;
+                    config.getPassword()));
         }
     }
 
@@ -40,12 +40,11 @@ public class ConnectionPool {
             if (closed) {
                 throw new IllegalStateException("ConnectionPool object is closed");
             }
-            while (used[lastFree]) {
+            while (connections.isEmpty()) {
                 condition.await();
             }
-            Connection conn = connections[lastFree];
-            used[lastFree] = true;
-            lastFree = (lastFree + 1) % size;
+            Connection conn = connections.removeLast();
+            used.put(Thread.currentThread(), conn);
             return conn;
         } finally {
             lock.unlock();
@@ -58,9 +57,9 @@ public class ConnectionPool {
             if (closed) {
                 throw new IllegalStateException("ConnectionPool object is closed");
             }
-            if (used[lastUsed]) {
-                used[lastUsed] = false;
-                lastUsed = (lastUsed + 1) % size;
+            if (used.containsKey(Thread.currentThread())) {
+                Connection conn = used.remove(Thread.currentThread());
+                connections.add(conn);
                 condition.signal();
             }
         } finally {
