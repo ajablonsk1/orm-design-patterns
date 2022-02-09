@@ -1,6 +1,7 @@
 package orm;
 
 
+import orm.annotations.ManyToMany;
 import orm.annotations.ManyToOne;
 import orm.schema.SchemaCreator;
 import orm.session.Session;
@@ -14,19 +15,27 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Session session = SessionFactory.getInstance().createSession();
 
-        SimpleClass sc = new SimpleClass();
+        List<SimpleClass> scs = new ArrayList<>();
+        List<ManyToManyCl> mtm = new ArrayList<>();
 
-        ManyToManyCl mtm = new ManyToManyCl();
+        for (int i = 0; i < 10; i++){
+            scs.add(new SimpleClass());
+            session.save(scs.get(i));
+        }
 
-        sc.scs = new ArrayList<>(List.of(mtm));
+        for (int i = 0; i < 10; i++){
+            mtm.add(new ManyToManyCl());
+            session.save(mtm.get(i));
+        }
 
-        mtm.scs = new ArrayList<>(List.of(sc));
+        for (int i = 0; i < 10; i++){
+            scs.get(i).scs = mtm;
+        }
 
-        session.save(sc);
-        session.save(mtm);
+        for (int i = 0; i < 10; i++){
+            mtm.get(i).scs = scs;
+        }
 
         session.flush();
-
-
     }
 }

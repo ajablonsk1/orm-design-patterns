@@ -1,9 +1,10 @@
-package orm.session;
+package orm.session.operations;
 
 import orm.annotations.ManyToOne;
 import orm.annotations.OneToMany;
 import orm.annotations.OneToOne;
 import orm.schema.ClassScanner;
+import orm.session.Executor;
 import orm.sql.CommandType;
 import orm.sql.Query;
 import orm.sql.QueryBuilder;
@@ -22,7 +23,7 @@ public class ObjectLoader {
     private Map<Integer, Object> objectsBeingLoaded = new HashMap<>();
     private ClassScanner classScanner = new ClassScanner();
 
-    ObjectLoader(Executor executor, Map<Integer,Object> identityMap){
+    public ObjectLoader(Executor executor, Map<Integer, Object> identityMap){
         this.executor = executor;
         this.identityMap = identityMap;
     }

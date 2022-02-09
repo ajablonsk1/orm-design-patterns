@@ -1,15 +1,15 @@
 package orm.session;
 
-import orm.annotations.ManyToMany;
 import orm.annotations.OneToOne;
 import orm.schema.ClassFinder;
 import orm.schema.ClassScanner;
+import orm.session.operations.ObjectLoader;
+import orm.session.operations.ObjectSaver;
 import orm.sql.CommandType;
 import orm.sql.IdGiver;
 import orm.sql.Query;
 import orm.sql.QueryBuilder;
 
-import java.io.FileReader;
 import java.lang.reflect.*;
 import java.sql.SQLException;
 import java.util.*;
@@ -24,6 +24,7 @@ public class Session {
     private ClassFinder classFinder;
     private ClassScanner classScanner;
     private ObjectLoader objectLoader;
+    private ObjectSaver objectSaver;
 
     // konstruktor package-private, aby tylko klasa SessionFactory mogła tworzyć obiekty klasy Session
     Session(ConnectionPool connectionPool) throws Exception {
@@ -32,6 +33,7 @@ public class Session {
         classFinder = new ClassFinder();
         classScanner = new ClassScanner();
         objectLoader = new ObjectLoader(executor, identityMap);
+        objectSaver = new ObjectSaver(executor, identityMap, objectsToSave, idGiver);
     }
 
     public void save(Object object) {
@@ -49,98 +51,6 @@ public class Session {
     public void delete(Object object) {
         objectsToDelete.add(object);
     }
-
-    private void insertRecord(Class<?> clazz, Object object){
-        QueryBuilder qb = new QueryBuilder(CommandType.INSERT);
-        try {
-            qb.addTable(clazz);
-            qb.addColumn("id", "").addValue(getObjectId(object));
-            for (Field column : classScanner.getColumns(clazz)) {
-                qb.addColumn(column).addValue(column.get(object));
-            }
-
-            for (Field field : classScanner.getOneToOneFields(clazz)) {
-                if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
-                    String columnName = field.getName() + "_id";
-                    qb.addColumn(columnName, null);
-                    qb.addValue(null);
-                    //qb.addValue(getObjectId(field.get(object)));
-                }
-            }
-
-            for (Field field : classScanner.getManyToOneFields(clazz)) {
-                String columnName = field.getName() + "_id";
-                qb.addColumn(columnName, null);
-                qb.addValue(null);
-                //qb.addValue(getObjectId(field.get(object)));
-            }
-
-        } catch (IllegalAccessException e){
-            e.printStackTrace();
-        }
-
-        Query query = qb.build();
-        executor.execute(query);
-    }
-
-    private void setForeignKeys(Class<?> cl, Object object) {
-        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-
-        try {
-            for (Field field : classScanner.getOneToOneFields(cl)) {
-                if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
-                    qb = new QueryBuilder(CommandType.UPDATE);
-                    qb.addTable(cl);
-                    String columnName = field.getName() + "_id";
-                    qb.setColumn(columnName, getObjectId(field.get(object)));
-                    qb.addCondition("id = " + getObjectId(object));
-                    executor.execute(qb.build());
-                }
-            }
-
-            for (Field field : classScanner.getManyToOneFields(cl)) {
-                qb = new QueryBuilder(CommandType.UPDATE);
-                qb.addTable(cl);
-                String columnName = field.getName() + "_id";
-                qb.setColumn(columnName, getObjectId(field.get(object)));
-                qb.addCondition("id = " + getObjectId(object));
-                executor.execute(qb.build());
-            }
-
-        } catch (IllegalAccessException e){
-            e.printStackTrace();
-        }
-
-    }
-
-
-    private void flushSave() {
-        for (Object object: objectsToSave){
-            try {
-                if (!identityMap.containsValue(object)) {
-                    int id = idGiver.getId();
-                    identityMap.put(id, object);
-                    setObjectId(object, id);
-                }
-            } catch (SQLException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
-        for (Object object: objectsToSave) {
-            insertRecord(object.getClass(), object);
-            for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass()))
-                insertRecord(clazz, object);
-        }
-
-        for (Object object: objectsToSave) {
-            setForeignKeys(object.getClass(), object);
-            for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass()))
-                setForeignKeys(clazz, object);
-        }
-    }
-
-
 
     private void updateRecord(Class<?> cl, Object object) {
         try {
@@ -228,7 +138,7 @@ public class Session {
     }
 
     public void flush(){
-        flushSave();
+        objectSaver.saveAll();
         flushUpdate();
         flushDelete();
 
