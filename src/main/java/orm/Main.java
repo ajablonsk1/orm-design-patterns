@@ -1,7 +1,6 @@
 package orm;
 
 
-import orm.annotations.ManyToMany;
 import orm.annotations.ManyToOne;
 import orm.schema.SchemaCreator;
 import orm.session.Session;
@@ -15,27 +14,57 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Session session = SessionFactory.getInstance().createSession();
 
-        List<SimpleClass> scs = new ArrayList<>();
-        List<ManyToManyCl> mtm = new ArrayList<>();
+        SimpleClass sc = new SimpleClass();
+        sc.cos = "@$#@$";
 
-        for (int i = 0; i < 10; i++){
-            scs.add(new SimpleClass());
-            session.save(scs.get(i));
-        }
+        OneToManyCl oneToManyCl = new OneToManyCl();
+        OneToOneCl oneToOneCl = new OneToOneCl();
 
-        for (int i = 0; i < 10; i++){
-            mtm.add(new ManyToManyCl());
-            session.save(mtm.get(i));
-        }
+        sc.oneToMany = new ArrayList<>();
+        sc.oneToMany.add(oneToManyCl);
+        oneToManyCl.sc = sc;
 
-        for (int i = 0; i < 10; i++){
-            scs.get(i).scs = mtm;
-        }
+        sc.oneToOne = oneToOneCl;
+        oneToOneCl.sc =sc;
 
-        for (int i = 0; i < 10; i++){
-            mtm.get(i).scs = scs;
-        }
+        session.save(sc);
+        session.save(oneToManyCl);
+        session.save(oneToOneCl);
+
+        OneToManyCl someNewOneToManyCl = new OneToManyCl();
+        someNewOneToManyCl.sc = sc;
+
+        session.save(someNewOneToManyCl);
 
         session.flush();
+
+        SimpleClass sc2 = new SimpleClass();
+
+        sc2.cos = "lubie placki";
+        sc2.oneToMany = new ArrayList<>();
+        sc2.oneToOne = oneToOneCl;
+
+        oneToOneCl.sc = sc2;
+
+        session.save(sc2);
+        session.update(oneToOneCl);
+
+        sc.cos = "Haha, xd";
+        sc.oneToMany.add(someNewOneToManyCl);
+        session.update(sc);
+
+        session.flush();
+
+        InheritingClass inheritingClass = new InheritingClass();
+        inheritingClass.cos = "sgsgs";
+        inheritingClass.name = "qweryterw";
+        session.save(inheritingClass);
+        session.flush();
+        session.delete(inheritingClass);
+        session.flush();
+        session.delete(sc);
+        session.delete(sc2);
+        session.flush();
+
     }
 }

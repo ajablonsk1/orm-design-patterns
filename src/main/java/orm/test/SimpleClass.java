@@ -9,8 +9,17 @@ import java.util.List;
 public class SimpleClass {
     @Id
     public int id;
+    @Column
+    public String cos;
 
     @ManyToMany(tableName = "tabelaLacznikowa")
     public List<ManyToManyCl> scs;
+
+    @OneToOne(foreignKeyInThisTable = false)
+    public OneToOneCl oneToOne;
+
+    @OneToMany
+    public List<OneToManyCl> oneToMany;
+
 
 }
