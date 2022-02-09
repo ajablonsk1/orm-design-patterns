@@ -160,7 +160,9 @@ public class Session {
     }
 
     private void flushDelete() {
+        for(Object object: objectsToDelete){
 
+        }
 
         // TODO
     }
