@@ -12,18 +12,15 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ConnectionPool {
-    private final int size;
     private final Deque<Connection> connections;
-    private HashMap<Thread, Connection> used;
+    private final HashMap<Thread, Connection> used;
     private final Lock lock = new ReentrantLock(true);
     private final Condition condition = lock.newCondition();
-    private int lastFree = 0;
-    private int lastUsed = 0;
     private boolean closed = false;
 
     public ConnectionPool() throws Exception {
         Config config = Config.getInstance();
-        this.size = config.getConnectionPoolSize();
+        int size = config.getConnectionPoolSize();
         this.connections = new ArrayDeque<>(size);
         this.used = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
@@ -75,7 +72,6 @@ public class ConnectionPool {
                 conn.close();
             }
         } catch (SQLException e) {
-            // TODO: Obsługa błędu
             e.printStackTrace();
         } finally {
             lock.unlock();

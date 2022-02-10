@@ -48,7 +48,6 @@ public class Executor {
                 result = Optional.of(rowSet);
             }
         } catch (SQLException e) {
-            // TODO: Obsługa błędu
             e.printStackTrace();
         } finally {
             releaseConnection();
@@ -61,7 +60,6 @@ public class Executor {
         try {
             connection = connectionPool.getConnection();
         } catch (InterruptedException e) {
-            // TODO: Obsługa błędu
             e.printStackTrace();
         }
         return connection;

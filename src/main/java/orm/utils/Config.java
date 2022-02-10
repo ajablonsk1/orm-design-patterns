@@ -14,13 +14,13 @@ import java.util.List;
 
 public class Config {
     private int connectionPoolSize;
-    private List<String> packages;
+    private final List<String> packages;
 
     private static Config instance;
-    private String user;
-    private String password;
-    private String databaseUrl;
-    private String databaseName;
+    private final String user;
+    private final String password;
+    private final String databaseUrl;
+    private final String databaseName;
     private boolean createSchemaOnStart;
 
     private Config() throws Exception {
@@ -62,7 +62,7 @@ public class Config {
             }
         }
         return instance;
-    };
+    }
 
     public int getConnectionPoolSize() {
         return connectionPoolSize;

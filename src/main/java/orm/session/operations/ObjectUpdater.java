@@ -1,6 +1,5 @@
 package orm.session.operations;
 
-import orm.annotations.Id;
 import orm.annotations.ManyToMany;
 import orm.annotations.OneToOne;
 import orm.schema.ClassScanner;
@@ -17,10 +16,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ObjectUpdater {
-    private Set<Object> objectsToUpdate;
-    private Executor executor;
-    private ClassScanner classScanner = new ClassScanner();
-    private IdService idService = new IdService();
+    private final Set<Object> objectsToUpdate;
+    private final Executor executor;
+    private final ClassScanner classScanner = new ClassScanner();
+    private final IdService idService = new IdService();
 
     public ObjectUpdater(Set<Object> objectsToUpdate, Executor executor){
         this.objectsToUpdate = objectsToUpdate;
@@ -44,22 +43,12 @@ public class ObjectUpdater {
 
             for (Field field : classScanner.getOneToOneFields(cl)) {
                 if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
-                    QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-                    qb.addTable(cl);
-                    String columnName = field.getName() + "_id";
-                    qb.setColumn(columnName, idService.getObjectId(field.get(object)));
-                    qb.addCondition("id = " + thisId);
-                    executor.execute(qb.build());
+                    updateForeignKeyValue(cl, object, thisId, field);
                 }
             }
 
             for (Field field : classScanner.getManyToOneFields(cl)) {
-                QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-                qb.addTable(cl);
-                String columnName = field.getName() + "_id";
-                qb.setColumn(columnName, idService.getObjectId(field.get(object)));
-                qb.addCondition("id = " + thisId);
-                executor.execute(qb.build());
+                updateForeignKeyValue(cl, object, thisId, field);
             }
 
             for (Field field : classScanner.getManyToManyFields(cl)){
@@ -80,7 +69,13 @@ public class ObjectUpdater {
                     otherObjectIdsInDatabase.add(crs.getInt(1));
                 }
 
-                Set<Object> otherObjectsActual = new HashSet<>(((Collection<Object>) field.get(object)));
+                Object obj = field.get(object);
+                Set<?> otherObjectsActual;
+                if (obj != null) {
+                    otherObjectsActual = new HashSet<>(((Collection<?>) field.get(object)));
+                } else {
+                    otherObjectsActual = new HashSet<>();
+                }
                 Set<Integer> otherObjectIdsActual = new HashSet<>();
                 for (Object o: otherObjectsActual){
                     otherObjectIdsActual.add(idService.getObjectId(o));
@@ -118,6 +113,15 @@ public class ObjectUpdater {
             e.printStackTrace();
         }
 
+    }
+
+    private void updateForeignKeyValue(Class<?> cl, Object object, Integer thisId, Field field) throws IllegalAccessException {
+        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+        qb.addTable(cl);
+        String columnName = field.getName() + "_id";
+        qb.setColumn(columnName, idService.getObjectId(field.get(object)));
+        qb.addCondition("id = " + thisId);
+        executor.execute(qb.build());
     }
 
     public void updateAll() {

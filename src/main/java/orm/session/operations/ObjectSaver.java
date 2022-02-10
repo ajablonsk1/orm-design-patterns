@@ -5,14 +5,13 @@ import orm.annotations.OneToOne;
 import orm.schema.ClassScanner;
 import orm.session.Executor;
 import orm.sql.CommandType;
-import orm.sql.IdGiver;
+import orm.session.IdGiver;
 import orm.sql.Query;
 import orm.sql.QueryBuilder;
 
 import javax.sql.rowset.CachedRowSet;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
@@ -21,11 +20,11 @@ import java.util.Set;
 public class ObjectSaver {
 
     private final IdGiver idGiver;
-    private ClassScanner classScanner = new ClassScanner();
-    private Executor executor;
-    private Map<Integer, Object> identityMap;
-    private Set<Object> objectsToSave;
-    private IdService idService = new IdService();
+    private final ClassScanner classScanner = new ClassScanner();
+    private final Executor executor;
+    private final Map<Integer, Object> identityMap;
+    private final Set<Object> objectsToSave;
+    private final IdService idService = new IdService();
 
     public ObjectSaver(Executor executor, Map<Integer, Object> identityMap, Set<Object> objectsToSave, IdGiver idGiver){
         this.executor = executor;
@@ -68,33 +67,33 @@ public class ObjectSaver {
     }
 
     private void setForeignKeys(Class<?> cl, Object object) {
-        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+
 
         try {
             for (Field field : classScanner.getOneToOneFields(cl)) {
                 if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
-                    qb = new QueryBuilder(CommandType.UPDATE);
-                    qb.addTable(cl);
-                    String columnName = field.getName() + "_id";
-                    qb.setColumn(columnName, idService.getObjectId(field.get(object)));
-                    qb.addCondition("id = " + idService.getObjectId(object));
-                    executor.execute(qb.build());
+                    updateForeignKeyValue(cl, object, field);
                 }
             }
 
             for (Field field : classScanner.getManyToOneFields(cl)) {
-                qb = new QueryBuilder(CommandType.UPDATE);
-                qb.addTable(cl);
-                String columnName = field.getName() + "_id";
-                qb.setColumn(columnName, idService.getObjectId(field.get(object)));
-                qb.addCondition("id = " + idService.getObjectId(object));
-                executor.execute(qb.build());
+                updateForeignKeyValue(cl, object, field);
             }
 
         } catch (IllegalAccessException e){
             e.printStackTrace();
         }
     }
+
+    private void updateForeignKeyValue(Class<?> cl, Object object, Field field) throws IllegalAccessException {
+        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+        qb.addTable(cl);
+        String columnName = field.getName() + "_id";
+        qb.setColumn(columnName, idService.getObjectId(field.get(object)));
+        qb.addCondition("id = " + idService.getObjectId(object));
+        executor.execute(qb.build());
+    }
+
 
     public void saveAll() {
         for (Object object: objectsToSave){
@@ -134,7 +133,7 @@ public class ObjectSaver {
 
                 AccessibleObject.setAccessible(new AccessibleObject[]{field}, true);
 
-                for (Object otherObj : (Collection) field.get(object)) {
+                for (Object otherObj : (Collection<?>) field.get(object)) {
                     // check if record is already inserted
                     QueryBuilder qb = new QueryBuilder(CommandType.SELECT)
                             .addColumn(thisColumn, "")

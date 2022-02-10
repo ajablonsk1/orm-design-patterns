@@ -19,10 +19,10 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class ObjectLoader {
-    private Executor executor;
-    private Map<Integer, Object> identityMap;
-    private Map<Integer, Object> objectsBeingLoaded = new HashMap<>();
-    private ClassScanner classScanner = new ClassScanner();
+    private final Executor executor;
+    private final Map<Integer, Object> identityMap;
+    private final Map<Integer, Object> objectsBeingLoaded = new HashMap<>();
+    private final ClassScanner classScanner = new ClassScanner();
 
     public ObjectLoader(Executor executor, Map<Integer, Object> identityMap){
         this.executor = executor;
@@ -100,7 +100,6 @@ public class ObjectLoader {
 
         CachedRowSet set = executor.execute(query1).orElseThrow(SQLException::new);
 
-        //TODO: nie obslugujemy hashsetow jakby komus sie zachcialo
         Collection<Object> container = new ArrayList<>();
         while (set.next()){
             Integer ids = set.getInt("id");
@@ -129,18 +128,14 @@ public class ObjectLoader {
         return fieldValue;
     }
 
-    private boolean setField(Object object, Field field, Object fieldValue){
+    private void setField(Object object, Field field, Object fieldValue) throws IllegalAccessException {
 
-        try {
-            field.set(object,fieldValue);
-            return true;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return false;
+        field.setAccessible(true);
+        field.set(object,fieldValue);
+        field.setAccessible(false);
     }
 
-    private Integer findKey(String tableName, Integer foreignKey, String column) throws SQLException {
+    private Integer findKey(String tableName, Integer foreignKey, String column) throws Exception {
 
         String[] array = column.split("\\.");
         column = array[array.length-1].toLowerCase();
@@ -154,13 +149,12 @@ public class ObjectLoader {
         if (set.next()) {
             return set.getInt(1);
         }
-        return null;
+        throw new Exception("Record referenced by foreign key does not exist");
     }
     private Object getManyToManyFieldValue(Class<?> clazz, Integer id, Field field) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Object fieldValue;
         String junctionTable = field.getAnnotation(ManyToMany.class).tableName();
 
-        //TODO jak inna nazwa tabeli
 
         ParameterizedType pType = (ParameterizedType) field.getGenericType();
         Class<?> otherClass = (Class<?>) pType.getActualTypeArguments()[0];
@@ -172,7 +166,6 @@ public class ObjectLoader {
 
         CachedRowSet set = executor.execute(query).orElseThrow(SQLException::new);
 
-        //TODO: nie obslugujemy hashsetow jakby komus sie zachcialo
         Collection<Object> container = new ArrayList<>();
 
         while (set.next()){

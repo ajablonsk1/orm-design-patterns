@@ -72,9 +72,7 @@ public class Query {
             if (aggregateFunctions.size() != 0) {
                 Map.Entry<AggregateFunction, String> entry = aggregateFunctions.remove(0);
                 sql.append(", " + entry.getKey().toString(entry.getValue()));
-                aggregateFunctions.forEach((func) -> {
-                    sql.append(", " + func.getKey().toString(func.getValue()));
-                });
+                aggregateFunctions.forEach((func) -> sql.append(", " + func.getKey().toString(func.getValue())));
             }
             sql.append(" FROM ");
             sql.append(String.join(", ", tables));

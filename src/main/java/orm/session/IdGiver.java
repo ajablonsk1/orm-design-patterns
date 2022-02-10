@@ -1,14 +1,15 @@
-package orm.sql;
-import orm.session.ConnectionPool;
-import orm.session.Executor;
+package orm.session;
+
+import orm.sql.CommandType;
+import orm.sql.Query;
+import orm.sql.QueryBuilder;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
-import java.util.Optional;
 
 public class IdGiver {
 
-    private Executor executor;
+    private final Executor executor;
 
     public IdGiver(ConnectionPool connectionPool){
         this.executor = new Executor(connectionPool);

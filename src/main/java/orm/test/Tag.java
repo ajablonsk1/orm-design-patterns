@@ -16,4 +16,12 @@ public class Tag {
     public List<Post> posts = new ArrayList<>();
     @Column
     public String name;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }

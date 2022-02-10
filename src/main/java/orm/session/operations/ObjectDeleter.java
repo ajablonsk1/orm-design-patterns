@@ -14,10 +14,10 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class ObjectDeleter {
-    private Executor executor;
-    private Map<Integer, Object> identityMap;
-    private Set<Object> objectsToDelete;
-    private ClassScanner classScanner = new ClassScanner();
+    private final Executor executor;
+    private final Map<Integer, Object> identityMap;
+    private final Set<Object> objectsToDelete;
+    private final ClassScanner classScanner = new ClassScanner();
 
     public ObjectDeleter(Executor executor, Map<Integer, Object> identityMap, Set<Object> objectsToDelete){
         this.executor = executor;
@@ -29,13 +29,13 @@ public class ObjectDeleter {
         List<Query> queries = new ArrayList<>();
         try {
             for (Object obj : objectsToDelete) {
-                Class cl = obj.getClass();
+                Class<?> cl = obj.getClass();
                 int id = getObjectId(obj);
                 identityMap.remove(id);
 
                 deleteForClass(obj, obj.getClass());
 
-                for (Class parent : classScanner.getParentEntityClasses(cl)) {
+                for (Class<?> parent : classScanner.getParentEntityClasses(cl)) {
                     deleteForClass(obj, parent);
                     QueryBuilder qb = new QueryBuilder(CommandType.DELETE);
                     qb.addTable(parent);
@@ -54,7 +54,7 @@ public class ObjectDeleter {
         }
     }
 
-    private void deleteForClass(Object obj, Class cl) throws IllegalAccessException {
+    private void deleteForClass(Object obj, Class<?> cl) throws IllegalAccessException {
         List<Query> queries = new ArrayList<>();
         int id = getObjectId(obj);
 
@@ -66,7 +66,7 @@ public class ObjectDeleter {
         executor.execute(queries);
     }
 
-    private void getQueriesForOneToOne(Object obj, Class cl, int id, List<Query> queries) throws IllegalAccessException {
+    private void getQueriesForOneToOne(Object obj, Class<?> cl, int id, List<Query> queries) throws IllegalAccessException {
         for (Field field : classScanner.getOneToOneFields(cl)) {
             field.setAccessible(true);
             Object fieldValue = field.get(obj);
@@ -96,10 +96,10 @@ public class ObjectDeleter {
         }
     }
 
-    private void getQueriesForOneToMany(Object obj, Class cl, int id, List<Query> queries) throws IllegalAccessException {
+    private void getQueriesForOneToMany(Object obj, Class<?> cl, int id, List<Query> queries) throws IllegalAccessException {
         for (Field field : classScanner.getOneToManyFields(cl)) {
             field.setAccessible(true);
-            Collection collection = (Collection) field.get(obj);
+            Collection<?> collection = (Collection<?>) field.get(obj);
             if (collection == null)
                 continue;
             for (Object fieldValue : collection) {
@@ -127,13 +127,12 @@ public class ObjectDeleter {
         }
     }
 
-    private void getQueriesForManyToOne(Object obj, Class cl, int id, List<Query> queries) throws IllegalAccessException {
+    private void getQueriesForManyToOne(Object obj, Class<?> cl, int id, List<Query> queries) throws IllegalAccessException {
         for (Field field : classScanner.getManyToOneFields(cl)) {
             field.setAccessible(true);
             Object fieldValue = field.get(obj);
             if (fieldValue == null)
                 continue;
-            int fieldId = getObjectId(fieldValue);
             QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
             qb.addTable(cl);
             qb.setColumn(field.getName().toLowerCase()+"_id", null);
@@ -143,12 +142,10 @@ public class ObjectDeleter {
         }
     }
 
-    private void getQueriesForManyToMany(Object obj, Class cl, int id, List<Query> queries) throws IllegalAccessException {
+    private void getQueriesForManyToMany(Object obj, Class<?> cl, int id, List<Query> queries) throws IllegalAccessException {
         for (Field field : classScanner.getManyToManyFields(cl)) {
-            System.out.println(cl);
-            System.out.println(field.getName());
             field.setAccessible(true);
-            Collection collection = (Collection) field.get(obj);
+            Collection<?> collection = (Collection<?>) field.get(obj);
             if (collection == null)
                 continue;
             for (Object fieldValue : collection) {
@@ -170,9 +167,9 @@ public class ObjectDeleter {
         return (int) classScanner.getIdField(object.getClass()).get(object);
     }
 
-    private Class getElementClass(Field field) {
+    private Class<?> getElementClass(Field field) {
         Type type = field.getGenericType();
-        Class ret;
+        Class<?> ret;
         if (type instanceof ParameterizedType) {
             Type[] typeArguments = ((ParameterizedType) type).getActualTypeArguments();
             if (typeArguments.length == 0)
@@ -183,7 +180,7 @@ public class ObjectDeleter {
             if (!(typeArguments[0] instanceof Class)) {
                 throw new IllegalArgumentException("Field not parametrised by Class");
             }
-            ret = (Class) typeArguments[0];
+            ret = (Class<?>) typeArguments[0];
         } else {
             throw new IllegalArgumentException("Field not parametrised by any type");
         }

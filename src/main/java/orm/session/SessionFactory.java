@@ -3,10 +3,6 @@ package orm.session;
 import orm.schema.SchemaCreator;
 import orm.utils.Config;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 public class SessionFactory {
     private volatile static SessionFactory sessionFactory;
     private ConnectionPool connectionPool;
@@ -36,7 +32,7 @@ public class SessionFactory {
         return sessionFactory;
     }
 
-    public Session createSession() throws Exception {
+    public Session createSession() {
         if (session.get() == null) {
             synchronized (this) {
                 if (session.get() == null) {

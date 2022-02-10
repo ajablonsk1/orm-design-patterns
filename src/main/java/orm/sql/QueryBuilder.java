@@ -5,7 +5,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 public class QueryBuilder {
-    private Query query = new Query();
+    private final Query query = new Query();
 
     public QueryBuilder(){}
     public QueryBuilder(CommandType commandType){
@@ -17,7 +17,7 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder addTable(Class cl) {
+    public QueryBuilder addTable(Class<?> cl) {
         if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
         }
@@ -73,7 +73,7 @@ public class QueryBuilder {
 
     public QueryBuilder addForeignKey(Field field){
         String column = field.getName().toLowerCase() + "_id";
-        Class clazz = field.getType();
+        Class<?> clazz = field.getType();
         String refTable;
         // if field is a collection, take inside type
         if (Collection.class.isAssignableFrom(clazz)){
@@ -84,11 +84,11 @@ public class QueryBuilder {
                             .getTypeName()
                             .split("\\."))
                     .reduce((first, second) -> second)
-                    .orElse(null)
-                    .toLowerCase();
+                    .orElse(null);
+            if (refTable != null)
+                    refTable = refTable.toLowerCase();
         }
         else refTable = clazz.getSimpleName().toLowerCase();
-        System.out.println(refTable);
         addForeignKey(column, refTable);
         return this;
     }
@@ -132,18 +132,6 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder groupByColumn(Field field) {
-        if (query.commandType == null) {
-            throw new IllegalStateException("Command type not set");
-        }
-        if (query.commandType != CommandType.SELECT) {
-            throw new IllegalStateException("Command is not set to SELECT");
-        }
-        query.groupByColumns.add(field.getName().toLowerCase());
-        query.isGrouped = true;
-        return this;
-    }
-
     public QueryBuilder addAggregate(AggregateFunction function, String column) {
         if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");
@@ -154,7 +142,7 @@ public class QueryBuilder {
         if (!query.isGrouped) {
             throw new IllegalStateException("No GROUP BY statement");
         }
-        query.aggregateFunctions.add(new AbstractMap.SimpleEntry<AggregateFunction, String>(function, column));
+        query.aggregateFunctions.add(new AbstractMap.SimpleEntry<>(function, column));
         return this;
     }
 
@@ -186,7 +174,7 @@ public class QueryBuilder {
         return query;
     }
 
-    private String getSqlTypeFromClass(Class cl) {
+    private String getSqlTypeFromClass(Class<?> cl) {
         if (cl == String.class || cl == Character.class || cl == char.class) {
             return "VARCHAR(50)";
         }
