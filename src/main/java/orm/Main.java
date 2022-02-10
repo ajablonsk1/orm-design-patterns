@@ -98,6 +98,10 @@ public class Main {
         session.save(oneToOneCl221);
         session.save(oneToOneCl222);
         session.flush();
+//        session.delete(sc1);
+//        session.delete(sc2);
+//        session.flush();
+
         session.delete(sc1);
         session.delete(sc2);
         session.delete(manyToManyCl1);

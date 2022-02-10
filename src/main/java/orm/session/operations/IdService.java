@@ -16,7 +16,10 @@ public class IdService {
         idField.set(object, id);
     }
 
-    public int getObjectId(Object object) throws IllegalAccessException {
+    public Integer getObjectId(Object object) throws IllegalAccessException {
+        if (object == null){
+            return null;
+        }
         Field idField = classScanner.getIdField(object.getClass());
         Field[] arr = new Field[1];
         arr[0] = idField;
