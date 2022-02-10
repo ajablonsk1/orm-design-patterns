@@ -162,6 +162,8 @@ public class Session {
         }
 
         for (Field field : classScanner.getManyToManyFields(cl)) {
+            System.out.println(cl);
+            System.out.println(field.getName());
             field.setAccessible(true);
             Collection collection = (Collection) field.get(obj);
             if (collection == null)
@@ -174,7 +176,7 @@ public class Session {
                 QueryBuilder qb = new QueryBuilder(CommandType.DELETE);
                 qb.addTable(tableName);
                 qb.addCondition(cl.getSimpleName().toLowerCase() + "_id" + " = " + id);
-                qb.addCondition(fieldValue.getClass().getSimpleName().toLowerCase() + "_id" + " = " + fieldId);
+                qb.addCondition(getElementClass(field).getSimpleName().toLowerCase() + "_id" + " = " + fieldId);
                 queries.add(qb.build());
             }
             field.setAccessible(false);

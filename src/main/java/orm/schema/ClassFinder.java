@@ -52,7 +52,6 @@ public class ClassFinder {
         return null;
     }
 
-    // TODO: Uwzględnić pozostałe adnotacje
     private boolean isEntityClass(Class cl) {
         Annotation[] annotations = cl.getAnnotationsByType(Entity.class);
         return annotations.length != 0;

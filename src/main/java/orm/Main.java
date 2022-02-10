@@ -100,6 +100,16 @@ public class Main {
         session.flush();
         session.delete(sc1);
         session.delete(sc2);
+        session.delete(manyToManyCl1);
+        session.delete(manyToManyCl2);
+        session.delete(oneToOneCl1);
+        session.delete(oneToOneCl2);
+        session.delete(oneToManyCl11);
+        session.delete(oneToManyCl12);
+        session.delete(oneToManyCl21);
+        session.delete(oneToManyCl22);
+        session.delete(oneToOneCl221);
+        session.delete(oneToOneCl222);
         session.flush();
     }
 }
