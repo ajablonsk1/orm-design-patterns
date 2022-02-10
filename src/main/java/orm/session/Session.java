@@ -65,96 +65,16 @@ public class Session {
                 int id = getObjectId(obj);
                 identityMap.remove(id);
 
-                for (Field field : classScanner.getOneToOneFields(cl)) {
-                    field.setAccessible(true);
-                    Object fieldValue = field.get(obj);
-                    if (fieldValue == null)
-                        continue;
-                    int fieldId = getObjectId(fieldValue);
-                    if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
-                        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-                        qb.addTable(cl);
-                        qb.setColumn(field.getName().toLowerCase()+"_id", null);
-                        qb.addCondition("id = " + id);
-                        queries.add(qb.build());
-                    } else {
-                        for (Field field1 : classScanner.getOneToOneFields(fieldValue.getClass())) {
-                            field1.setAccessible(true);
-                            if (field1.getAnnotation(OneToOne.class).foreignKeyInThisTable() && id == getObjectId(field1.get(fieldValue))) {
-                                QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-                                qb.addTable(fieldValue.getClass());
-                                qb.setColumn(field1.getName().toLowerCase()+"_id", null);
-                                qb.addCondition("id = " + fieldId);
-                                queries.add(qb.build());
-                            }
-                            field1.setAccessible(false);
-                        }
-                    }
-                    field.setAccessible(false);
-                }
-
-                for (Field field : classScanner.getOneToManyFields(cl)) {
-                    field.setAccessible(true);
-                    Collection collection = (Collection) field.get(obj);
-                    if (collection == null)
-                        continue;
-                    for (Object fieldValue : collection) {
-                        int fieldId = getObjectId(fieldValue);
-                        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-                        qb.addTable(fieldValue.getClass());
-                        String columnName = null;
-                        for (Field field1 : classScanner.getManyToOneFields(fieldValue.getClass())) {
-                            field1.setAccessible(true);
-                            Object field1Value = field1.get(fieldValue);
-                            if (field1Value == null)
-                                continue;
-                            if (id == getObjectId(field1Value)) {
-                                columnName = field1.getName().toLowerCase() + "_id";
-                            }
-                            field1.setAccessible(false);
-                        }
-                        qb.setColumn(columnName, null);
-                        qb.addCondition("id = " + fieldId);
-                        queries.add(qb.build());
-                    }
-                    field.setAccessible(false);
-                }
-
-                for (Field field : classScanner.getManyToOneFields(cl)) {
-                    field.setAccessible(true);
-                    Object fieldValue = field.get(obj);
-                    if (fieldValue == null)
-                        continue;
-                    int fieldId = getObjectId(fieldValue);
-                    QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-                    qb.addTable(cl);
-                    qb.setColumn(field.getName().toLowerCase()+"_id", null);
-                    qb.addCondition("id = " + id);
-                    queries.add(qb.build());
-                    field.setAccessible(false);
-                }
-
-                for (Field field : classScanner.getManyToManyFields(cl)) {
-                    field.setAccessible(true);
-                    Object fieldValue = field.get(obj);
-                    if (fieldValue == null)
-                        continue;
-                    int fieldId = getObjectId(fieldValue);
-                    String tableName = field.getAnnotation(ManyToMany.class).tableName();
-                    QueryBuilder qb = new QueryBuilder(CommandType.DELETE);
-                    qb.addTable(cl);
-                    qb.addCondition(cl.getSimpleName().toLowerCase() +"_id" + " = " + id);
-                    qb.addCondition(fieldValue.getClass().getSimpleName().toLowerCase() +"_id" + " = " + fieldId);
-                    queries.add(qb.build());
-                    field.setAccessible(false);
-                }
+                deleteForClass(obj, obj.getClass());
 
                 for (Class parent : classScanner.getParentEntityClasses(cl)) {
+                    deleteForClass(obj, parent);
                     QueryBuilder qb = new QueryBuilder(CommandType.DELETE);
                     qb.addTable(parent);
                     qb.addCondition("id = " + id);
                     queries.add(qb.build());
                 }
+
                 QueryBuilder qb = new QueryBuilder(CommandType.DELETE);
                 qb.addTable(cl);
                 qb.addCondition("id = " + id);
@@ -164,6 +84,102 @@ public class Session {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    private void deleteForClass(Object obj, Class cl) throws IllegalAccessException {
+        List<Query> queries = new ArrayList<>();
+        int id = getObjectId(obj);
+
+        for (Field field : classScanner.getOneToOneFields(cl)) {
+            field.setAccessible(true);
+            Object fieldValue = field.get(obj);
+            if (fieldValue == null)
+                continue;
+            int fieldId = getObjectId(fieldValue);
+            if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
+                QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                qb.addTable(cl);
+                qb.setColumn(field.getName().toLowerCase()+"_id", null);
+                qb.addCondition("id = " + id);
+                queries.add(qb.build());
+            } else {
+                for (Field field1 : classScanner.getOneToOneFields(fieldValue.getClass())) {
+                    field1.setAccessible(true);
+                    if (field1.getAnnotation(OneToOne.class).foreignKeyInThisTable() && id == getObjectId(field1.get(fieldValue))) {
+                        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                        qb.addTable(fieldValue.getClass());
+                        qb.setColumn(field1.getName().toLowerCase()+"_id", null);
+                        qb.addCondition("id = " + fieldId);
+                        queries.add(qb.build());
+                    }
+                    field1.setAccessible(false);
+                }
+            }
+            field.setAccessible(false);
+        }
+
+        for (Field field : classScanner.getOneToManyFields(cl)) {
+            field.setAccessible(true);
+            Collection collection = (Collection) field.get(obj);
+            if (collection == null)
+                continue;
+            for (Object fieldValue : collection) {
+                if (fieldValue == null)
+                    continue;
+                int fieldId = getObjectId(fieldValue);
+                QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                qb.addTable(fieldValue.getClass());
+                String columnName = null;
+                for (Field field1 : classScanner.getManyToOneFields(fieldValue.getClass())) {
+                    field1.setAccessible(true);
+                    Object field1Value = field1.get(fieldValue);
+                    if (field1Value == null)
+                        continue;
+                    if (id == getObjectId(field1Value)) {
+                        columnName = field1.getName().toLowerCase() + "_id";
+                    }
+                    field1.setAccessible(false);
+                }
+                qb.setColumn(columnName, null);
+                qb.addCondition("id = " + fieldId);
+                queries.add(qb.build());
+            }
+            field.setAccessible(false);
+        }
+
+        for (Field field : classScanner.getManyToOneFields(cl)) {
+            field.setAccessible(true);
+            Object fieldValue = field.get(obj);
+            if (fieldValue == null)
+                continue;
+            int fieldId = getObjectId(fieldValue);
+            QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+            qb.addTable(cl);
+            qb.setColumn(field.getName().toLowerCase()+"_id", null);
+            qb.addCondition("id = " + id);
+            queries.add(qb.build());
+            field.setAccessible(false);
+        }
+
+        for (Field field : classScanner.getManyToManyFields(cl)) {
+            field.setAccessible(true);
+            Collection collection = (Collection) field.get(obj);
+            if (collection == null)
+                continue;
+            for (Object fieldValue : collection) {
+                if (fieldValue == null)
+                    continue;
+                int fieldId = getObjectId(fieldValue);
+                String tableName = field.getAnnotation(ManyToMany.class).tableName();
+                QueryBuilder qb = new QueryBuilder(CommandType.DELETE);
+                qb.addTable(tableName);
+                qb.addCondition(cl.getSimpleName().toLowerCase() + "_id" + " = " + id);
+                qb.addCondition(fieldValue.getClass().getSimpleName().toLowerCase() + "_id" + " = " + fieldId);
+                queries.add(qb.build());
+            }
+            field.setAccessible(false);
+        }
+        executor.execute(queries);
     }
 
     public void flush(){
