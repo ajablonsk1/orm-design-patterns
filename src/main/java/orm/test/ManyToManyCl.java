@@ -4,6 +4,7 @@ import orm.annotations.Entity;
 import orm.annotations.Id;
 import orm.annotations.ManyToMany;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,5 +13,5 @@ public class ManyToManyCl {
     public int id;
 
     @ManyToMany(tableName = "tabelaLacznikowa")
-    public List<SimpleClass> scs;
+    public List<SimpleClass> scs = new ArrayList<>();
 }

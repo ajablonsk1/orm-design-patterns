@@ -5,6 +5,7 @@ import orm.schema.ClassFinder;
 import orm.schema.ClassScanner;
 import orm.session.operations.ObjectLoader;
 import orm.session.operations.ObjectSaver;
+import orm.session.operations.ObjectUpdater;
 import orm.sql.CommandType;
 import orm.sql.IdGiver;
 import orm.sql.Query;
@@ -25,6 +26,7 @@ public class Session {
     private ClassScanner classScanner;
     private ObjectLoader objectLoader;
     private ObjectSaver objectSaver;
+    private ObjectUpdater objectUpdater;
 
     // konstruktor package-private, aby tylko klasa SessionFactory mogła tworzyć obiekty klasy Session
     Session(ConnectionPool connectionPool) throws Exception {
@@ -34,6 +36,7 @@ public class Session {
         classScanner = new ClassScanner();
         objectLoader = new ObjectLoader(executor, identityMap);
         objectSaver = new ObjectSaver(executor, identityMap, objectsToSave, idGiver);
+        objectUpdater = new ObjectUpdater(objectsToUpdate, executor);
     }
 
     public void save(Object object) {
@@ -52,82 +55,6 @@ public class Session {
         objectsToDelete.add(object);
     }
 
-    private void updateRecord(Class<?> cl, Object object) {
-        try {
-            if (! classScanner.getColumns(cl).isEmpty()) {
-                QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-                qb.addTable(cl);
-
-                for (Field column : classScanner.getColumns(cl)) {
-                    qb.setColumn(column, column.get(object));
-                    qb.addCondition("id = " + getObjectId(object));
-                }
-                executor.execute(qb.build());
-            }
-
-            for (Field field : classScanner.getOneToOneFields(cl)) {
-                if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
-                    QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-                    qb.addTable(cl);
-                    String columnName = field.getName() + "_id";
-                    qb.setColumn(columnName, getObjectId(field.get(object)));
-                    qb.addCondition("id = " + getObjectId(object));
-                    executor.execute(qb.build());
-                }
-            }
-
-            for (Field field : classScanner.getManyToOneFields(cl)) {
-                QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
-                qb.addTable(cl);
-                String columnName = field.getName() + "_id";
-                qb.setColumn(columnName, getObjectId(field.get(object)));
-                qb.addCondition("id = " + getObjectId(object));
-                executor.execute(qb.build());
-            }
-
-            // update Many-to-Many
-
-//            for (Field field : classScanner.getManyToManyFields(cl)){
-//                String tableName = field.getAnnotation(ManyToMany.class).tableName();
-//
-//                // TODO wyciągnąć do zewnętrznej metody i sprawdzić czy działa w teście jednostkowym
-//                Class<?> otherClass = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-//
-//                String thisColumnName = classScanner.getManyToManyFields(otherClass)
-//                                            .stream()
-//                                            .filter(f -> f.getAnnotation(ManyToMany.class).tableName() == tableName)
-//                                            .reduce((first, second) -> first)
-//                                            .get()
-//                                            .getName().toLowerCase() + "_id";
-//
-//                String otherColumnName = field.getName().toLowerCase() + "_id";
-//
-//                // select from association table
-//                QueryBuilder qb2 = new QueryBuilder(CommandType.SELECT);
-//                qb2.addTable(tableName)
-//                        .addColumn(thisColumnName, "")
-//                        .addColumn(otherColumnName, "");
-
-                // find records to insert
-
-                // find records to delete
-           // }
-
-
-        } catch (IllegalAccessException e){
-            e.printStackTrace();
-        }
-
-    }
-
-    private void flushUpdate() {
-        for (Object object : objectsToUpdate){
-            updateRecord(object.getClass(), object);
-            for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass()))
-                updateRecord(clazz, object);
-        }
-        // TODO przy OneToMany update powinien dziać się z drugiej strony?
-    }
 
     private void flushDelete() {
         for(Object object: objectsToDelete){
@@ -139,12 +66,12 @@ public class Session {
 
     public void flush(){
         objectSaver.saveAll();
-        flushUpdate();
+        objectUpdater.updateAll();
         flushDelete();
 
-        objectsToSave = new HashSet<>();
-        objectsToDelete = new HashSet<>();
-        objectsToUpdate = new HashSet<>();
+        objectsToSave.clear();
+        objectsToDelete.clear();
+        objectsToUpdate.clear();
     }
 
     private void setObjectId(Object object, int id) throws IllegalAccessException {

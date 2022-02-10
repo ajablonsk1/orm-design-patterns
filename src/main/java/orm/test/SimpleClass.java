@@ -3,6 +3,7 @@ package orm.test;
 import orm.annotations.*;
 import orm.annotations.OneToOne;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -11,6 +12,6 @@ public class SimpleClass {
     public int id;
 
     @ManyToMany(tableName = "tabelaLacznikowa")
-    public List<ManyToManyCl> scs;
+    public List<ManyToManyCl> mtm = new ArrayList<>();
 
 }
