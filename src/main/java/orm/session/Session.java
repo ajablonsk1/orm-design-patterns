@@ -1,6 +1,7 @@
 package orm.session;
 
 import orm.annotations.OneToOne;
+import orm.annotations.ManyToMany;
 import orm.schema.ClassFinder;
 import orm.schema.ClassScanner;
 import orm.session.operations.ObjectLoader;
@@ -57,11 +58,112 @@ public class Session {
 
 
     private void flushDelete() {
-        for(Object object: objectsToDelete){
+        List<Query> queries = new ArrayList<>();
+        try {
+            for (Object obj : objectsToDelete) {
+                Class cl = obj.getClass();
+                int id = getObjectId(obj);
+                identityMap.remove(id);
 
+                for (Field field : classScanner.getOneToOneFields(cl)) {
+                    field.setAccessible(true);
+                    Object fieldValue = field.get(obj);
+                    if (fieldValue == null)
+                        continue;
+                    int fieldId = getObjectId(fieldValue);
+                    if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()) {
+                        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                        qb.addTable(cl);
+                        qb.setColumn(field.getName().toLowerCase()+"_id", null);
+                        qb.addCondition("id = " + id);
+                        queries.add(qb.build());
+                    } else {
+                        for (Field field1 : classScanner.getOneToOneFields(fieldValue.getClass())) {
+                            field1.setAccessible(true);
+                            if (field1.getAnnotation(OneToOne.class).foreignKeyInThisTable() && id == getObjectId(field1.get(fieldValue))) {
+                                QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                                qb.addTable(fieldValue.getClass());
+                                qb.setColumn(field1.getName().toLowerCase()+"_id", null);
+                                qb.addCondition("id = " + fieldId);
+                                queries.add(qb.build());
+                            }
+                            field1.setAccessible(false);
+                        }
+                    }
+                    field.setAccessible(false);
+                }
+
+                for (Field field : classScanner.getOneToManyFields(cl)) {
+                    field.setAccessible(true);
+                    Collection collection = (Collection) field.get(obj);
+                    if (collection == null)
+                        continue;
+                    for (Object fieldValue : collection) {
+                        int fieldId = getObjectId(fieldValue);
+                        QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                        qb.addTable(fieldValue.getClass());
+                        String columnName = null;
+                        for (Field field1 : classScanner.getManyToOneFields(fieldValue.getClass())) {
+                            field1.setAccessible(true);
+                            Object field1Value = field1.get(fieldValue);
+                            if (field1Value == null)
+                                continue;
+                            if (id == getObjectId(field1Value)) {
+                                columnName = field1.getName().toLowerCase() + "_id";
+                            }
+                            field1.setAccessible(false);
+                        }
+                        qb.setColumn(columnName, null);
+                        qb.addCondition("id = " + fieldId);
+                        queries.add(qb.build());
+                    }
+                    field.setAccessible(false);
+                }
+
+                for (Field field : classScanner.getManyToOneFields(cl)) {
+                    field.setAccessible(true);
+                    Object fieldValue = field.get(obj);
+                    if (fieldValue == null)
+                        continue;
+                    int fieldId = getObjectId(fieldValue);
+                    QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
+                    qb.addTable(cl);
+                    qb.setColumn(field.getName().toLowerCase()+"_id", null);
+                    qb.addCondition("id = " + id);
+                    queries.add(qb.build());
+                    field.setAccessible(false);
+                }
+
+                for (Field field : classScanner.getManyToManyFields(cl)) {
+                    field.setAccessible(true);
+                    Object fieldValue = field.get(obj);
+                    if (fieldValue == null)
+                        continue;
+                    int fieldId = getObjectId(fieldValue);
+                    String tableName = field.getAnnotation(ManyToMany.class).tableName();
+                    QueryBuilder qb = new QueryBuilder(CommandType.DELETE);
+                    qb.addTable(cl);
+                    qb.addCondition(cl.getSimpleName().toLowerCase() +"_id" + " = " + id);
+                    qb.addCondition(fieldValue.getClass().getSimpleName().toLowerCase() +"_id" + " = " + fieldId);
+                    queries.add(qb.build());
+                    field.setAccessible(false);
+                }
+
+                for (Class parent : classScanner.getParentEntityClasses(cl)) {
+                    QueryBuilder qb = new QueryBuilder(CommandType.DELETE);
+                    qb.addTable(parent);
+                    qb.addCondition("id = " + id);
+                    queries.add(qb.build());
+                }
+                QueryBuilder qb = new QueryBuilder(CommandType.DELETE);
+                qb.addTable(cl);
+                qb.addCondition("id = " + id);
+                queries.add(qb.build());
+                executor.execute(queries);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
-
-        // TODO
     }
 
     public void flush(){
@@ -90,5 +192,25 @@ public class Session {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private Class getElementClass(Field field) {
+        Type type = field.getGenericType();
+        Class ret;
+        if (type instanceof ParameterizedType) {
+            Type[] typeArguments = ((ParameterizedType) type).getActualTypeArguments();
+            if (typeArguments.length == 0)
+                throw new IllegalArgumentException("Field not parametrised by any type");
+            if (typeArguments.length != 1) {
+                throw new IllegalArgumentException("Field parametrised by more than one type");
+            }
+            if (!(typeArguments[0] instanceof Class)) {
+                throw new IllegalArgumentException("Field not parametrised by Class");
+            }
+            ret = (Class) typeArguments[0];
+        } else {
+            throw new IllegalArgumentException("Field not parametrised by any type");
+        }
+        return ret;
     }
 }
