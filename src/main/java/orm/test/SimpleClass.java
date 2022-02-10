@@ -19,11 +19,11 @@ public class SimpleClass {
     @OneToOne(foreignKeyInThisTable = false)
     public OneToOneCl oneToOne;
 
-    @OneToOne(foreignKeyInThisTable = true)
-    public OneToOneCl2 oneToOne2;
+//    @OneToOne(foreignKeyInThisTable = true)
+//    public OneToOneCl2 oneToOne2;
 
     @OneToMany
-    public List<OneToManyCl> oneToMany;
+    public List<OneToManyCl> oneToMany = new ArrayList<>();
 
 
 }

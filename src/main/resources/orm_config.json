@@ -1,8 +1,8 @@
 {
   "packages": ["orm.test"],
-  "user": "pholowi1",
-  "password": "zTUYvcmXMV8xnUX3",
-  "database_url": "jdbc:mariadb://mysql.agh.edu.pl:3306/pholowi1",
-  "database_name": "pholowi1",
-  "create_schema_on_start": false
+  "user": "root",
+  "password": "password",
+  "database_url": "jdbc:mysql://localhost:3306/test",
+  "database_name": "test",
+  "create_schema_on_start": true
 }
