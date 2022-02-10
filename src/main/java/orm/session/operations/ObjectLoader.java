@@ -1,5 +1,6 @@
 package orm.session.operations;
 
+import orm.annotations.ManyToMany;
 import orm.annotations.ManyToOne;
 import orm.annotations.OneToMany;
 import orm.annotations.OneToOne;
@@ -73,7 +74,10 @@ public class ObjectLoader {
                 Integer foreignKey = cachedRowSet.getInt(fieldType.getSimpleName() + "_id");
                 fieldValue = load(fieldType, foreignKey);
             }
-            else {
+            else if (field.isAnnotationPresent(ManyToMany.class)){
+                fieldValue = getManyToManyFieldValue(clazz,id,field);
+
+            }else {
                 //Only primitive
                 fieldValue = cachedRowSet.getObject(field.getName().toLowerCase());
             }
@@ -152,4 +156,33 @@ public class ObjectLoader {
         }
         return null;
     }
+    private Object getManyToManyFieldValue(Class<?> clazz, Integer id, Field field) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        Object fieldValue;
+        String junctionTable = field.getAnnotation(ManyToMany.class).tableName();
+
+        //TODO jak inna nazwa tabeli
+
+        ParameterizedType pType = (ParameterizedType) field.getGenericType();
+        Class<?> otherClass = (Class<?>) pType.getActualTypeArguments()[0];
+
+        Query query = new QueryBuilder(CommandType.SELECT).addTable(junctionTable)
+                .addColumn(otherClass.getSimpleName().toLowerCase() +"_id","")
+                .addCondition(clazz.getSimpleName().toLowerCase() + "_id = " + id)
+                .build();
+
+        CachedRowSet set = executor.execute(query).orElseThrow(SQLException::new);
+
+        //TODO: nie obslugujemy hashsetow jakby komus sie zachcialo
+        Collection<Object> container = new ArrayList<>();
+
+        while (set.next()){
+            Integer ids = set.getInt(1);
+            container.add(load(otherClass, ids));
+
+        }
+        fieldValue = container;
+        return fieldValue;
+
+    }
+
 }
