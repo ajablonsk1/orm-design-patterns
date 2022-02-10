@@ -39,7 +39,9 @@ public class ObjectSaver {
             qb.addTable(clazz);
             qb.addColumn("id", "").addValue(idService.getObjectId(object));
             for (Field column : classScanner.getColumns(clazz)) {
+                column.setAccessible(true);
                 qb.addColumn(column).addValue(column.get(object));
+                column.setAccessible(false);
             }
 
             for (Field field : classScanner.getOneToOneFields(clazz)) {
@@ -86,12 +88,14 @@ public class ObjectSaver {
     }
 
     private void updateForeignKeyValue(Class<?> cl, Object object, Field field) throws IllegalAccessException {
+        field.setAccessible(true);
         QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
         qb.addTable(cl);
         String columnName = field.getName() + "_id";
         qb.setColumn(columnName, idService.getObjectId(field.get(object)));
         qb.addCondition("id = " + idService.getObjectId(object));
         executor.execute(qb.build());
+        field.setAccessible(false);
     }
 
 

@@ -5,6 +5,8 @@ import orm.session.operations.ObjectLoader;
 import orm.session.operations.ObjectSaver;
 import orm.session.operations.ObjectUpdater;
 
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Session {
@@ -32,8 +34,13 @@ public class Session {
         objectsToSave.add(object);
     }
 
-    public Object load(Class<?> clazz, Integer id) throws Exception {
-        return objectLoader.load(clazz, id);
+    public Object load(Class<?> clazz, Integer id) {
+        try {
+            return objectLoader.load(clazz, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void update(Object object) {

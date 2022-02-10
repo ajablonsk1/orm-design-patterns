@@ -164,7 +164,11 @@ public class ObjectDeleter {
     }
 
     private int getObjectId(Object object) throws IllegalAccessException {
-        return (int) classScanner.getIdField(object.getClass()).get(object);
+        Field field =  classScanner.getIdField(object.getClass());
+        field.setAccessible(true);
+        int id = (int) field.get(object);
+        field.setAccessible(false);
+        return id;
     }
 
     private Class<?> getElementClass(Field field) {

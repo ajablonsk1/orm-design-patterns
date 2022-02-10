@@ -35,8 +35,10 @@ public class ObjectUpdater {
                 qb.addTable(cl);
 
                 for (Field column : classScanner.getColumns(cl)) {
+                    column.setAccessible(true);
                     qb.setColumn(column, column.get(object));
                     qb.addCondition("id = " + thisId);
+                    column.setAccessible(false);
                 }
                 executor.execute(qb.build());
             }
@@ -52,6 +54,7 @@ public class ObjectUpdater {
             }
 
             for (Field field : classScanner.getManyToManyFields(cl)){
+                field.setAccessible(true);
                 String tableName = field.getAnnotation(ManyToMany.class).tableName();
                 String thisColumn = AssociationTableService.getColumnNameForClass(object.getClass());
                 String otherColumn = AssociationTableService.getColumnNameForField(field);
@@ -106,6 +109,7 @@ public class ObjectUpdater {
                             .addCondition(otherColumn + " = " + id);
                     executor.execute(qb.build());
                 }
+                field.setAccessible(false);
              }
 
 
