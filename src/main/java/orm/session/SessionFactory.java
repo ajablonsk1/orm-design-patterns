@@ -9,9 +9,8 @@ import java.util.List;
 
 public class SessionFactory {
     private volatile static SessionFactory sessionFactory;
-    private List<Session> sessions = new ArrayList<>();
     private ConnectionPool connectionPool;
-    //private ThreadLocal<Session> session;
+    private ThreadLocal<Session> session;
 
     private SessionFactory () {
         try {
@@ -19,6 +18,7 @@ public class SessionFactory {
             SchemaCreator schemaCreator = new SchemaCreator(connectionPool);
             if (Config.getInstance().isCreateSchemaOnStart())
                 schemaCreator.createSchema();
+            session = ThreadLocal.withInitial(() -> null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -37,9 +37,13 @@ public class SessionFactory {
     }
 
     public Session createSession() throws Exception {
-        //TODO: threadLocal
-        Session session = new Session(connectionPool);
-        sessions.add(session);
-        return session;
+        if (session.get() == null) {
+            synchronized (this) {
+                if (session.get() == null) {
+                    session.set(new Session(connectionPool));
+                }
+            }
+        }
+        return session.get();
     }
 }
