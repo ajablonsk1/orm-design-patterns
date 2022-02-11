@@ -109,6 +109,14 @@ public class QueryBuilder {
         return this;
     }
 
+    public QueryBuilder setForeignKeyChecks(int foreignKeyChecks) {
+        if (query.commandType == null) {
+            throw new IllegalStateException("Command type not set");
+        }
+        query.foreignKeyChecks = foreignKeyChecks;
+        return this;
+    }
+
     public QueryBuilder distinct(boolean distinct) {
         if (query.commandType == null) {
             throw new IllegalStateException("Command type not set");

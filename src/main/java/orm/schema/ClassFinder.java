@@ -56,5 +56,4 @@ public class ClassFinder {
         Annotation[] annotations = cl.getAnnotationsByType(Entity.class);
         return annotations.length != 0;
     }
-
 }

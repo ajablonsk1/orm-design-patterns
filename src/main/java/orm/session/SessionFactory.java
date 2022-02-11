@@ -12,8 +12,9 @@ public class SessionFactory {
         try {
             this.connectionPool = new ConnectionPool();
             SchemaCreator schemaCreator = new SchemaCreator(connectionPool);
-            if (Config.getInstance().isCreateSchemaOnStart())
+            if (Config.getInstance().isCreateSchemaOnStart()) {
                 schemaCreator.createSchema();
+            }
             session = ThreadLocal.withInitial(() -> null);
         } catch (Exception e) {
             e.printStackTrace();

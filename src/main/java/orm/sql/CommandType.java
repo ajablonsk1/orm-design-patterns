@@ -7,7 +7,8 @@ public enum CommandType {
     INSERT,
     UPDATE,
     DELETE,
-    SELECT;
+    SELECT,
+    SET;
 
     @Override
     public String toString() {
@@ -32,6 +33,9 @@ public enum CommandType {
             }
             case SELECT -> {
                 return "SELECT";
+            }
+            case SET -> {
+                return "SET";
             }
             default -> {return "INCORRECT";}
         }

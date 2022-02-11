@@ -16,6 +16,7 @@ public class Query {
     List<Map.Entry<AggregateFunction, String>> aggregateFunctions = new ArrayList<>();
     List<String> setColumns = new ArrayList<>();
     List<String> foreignKeys = new ArrayList<>();
+    int foreignKeyChecks = 0;
 
     public Query(){}
 
@@ -43,7 +44,7 @@ public class Query {
             sql.append(";");
         }
         if (commandType == CommandType.DROP) {
-            sql.append(commandType + " ");
+            sql.append(commandType + " IF EXISTS ");
             sql.append(String.join(", ", tables));
             sql.append(";");
         }
@@ -106,6 +107,12 @@ public class Query {
                 sql.append(", ADD ");
                 sql.append(String.join(", ADD ", foreignKeys));
             }
+            sql.append(";");
+        }
+
+        if (commandType == CommandType.SET) {
+            sql.append(commandType + " FOREIGN_KEY_CHECKS = ");
+            sql.append(foreignKeyChecks);
             sql.append(";");
         }
         return sql.toString();

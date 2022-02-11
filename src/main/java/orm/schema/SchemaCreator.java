@@ -7,6 +7,7 @@ import orm.session.Executor;
 import orm.sql.CommandType;
 import orm.sql.Query;
 import orm.sql.QueryBuilder;
+import orm.utils.Config;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -30,6 +31,7 @@ public class SchemaCreator {
 
     public void createSchema() throws Exception {
         entityClasses = finder.findEntityClasses();
+        dropAllTables();
         addQueryForIdTable();
         addQueriesToCreateTables();
         addQueriesForOneToOnes();
@@ -39,6 +41,25 @@ public class SchemaCreator {
 
         // przy strategii Class Table Inheritance nie potrzeba tu dodatkowego kodu do obsługi dziedziczenia
         executor.execute(queries);
+    }
+
+    public void dropAllTables() throws Exception {
+        queries.add(new QueryBuilder(CommandType.SET)
+                .setForeignKeyChecks(0).build());
+        for(Class<?> clazz: entityClasses){
+            QueryBuilder qb1 = new QueryBuilder(CommandType.DROP);
+            for (Field field: scanner.getManyToManyFields(clazz)){
+                QueryBuilder qb2 = new QueryBuilder(CommandType.DROP);
+                String associationTable = field.getAnnotation(ManyToMany.class).tableName();
+                qb2.addTable(associationTable);
+                queries.add(qb2.build());
+            }
+            qb1.addTable(clazz);
+            queries.add(qb1.build());
+        }
+        queries.add(new QueryBuilder(CommandType.DROP).addTable("id").build());
+        queries.add(new QueryBuilder(CommandType.SET)
+                .setForeignKeyChecks(1).build());
     }
 
     public void addQueryForIdTable(){
