@@ -13,9 +13,7 @@ import javax.sql.rowset.CachedRowSet;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ObjectSaver {
 
@@ -102,11 +100,7 @@ public class ObjectSaver {
     public void saveAll() {
         for (Object object: objectsToSave){
             try {
-                if (!identityMap.containsValue(object)) {
-                    int id = idGiver.getId();
-                    identityMap.put(id, object);
-                    idService.setObjectId(object, id);
-                }
+                setIdForObjects(object);
             } catch (SQLException | IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -164,5 +158,50 @@ public class ObjectSaver {
         }
     }
 
+    private void setIdForObjects(Object obj) throws IllegalAccessException, SQLException {
+        if (identityMap.containsValue(obj))
+            return;
 
+        int id = idGiver.getId();
+        identityMap.put(id, obj);
+        idService.setObjectId(obj, id);
+
+        List<Class<?>> classes = new ArrayList<>();
+        classes.add(obj.getClass());
+        classes.addAll(classScanner.getParentEntityClasses(obj.getClass()));
+
+        for (Class<?> cl : classes) {
+            List<Field> objFields = new ArrayList<>();
+            objFields.addAll(classScanner.getOneToOneFields(cl));
+            objFields.addAll(classScanner.getManyToOneFields(cl));
+
+            List<Field> collFields = new ArrayList<>();
+            collFields.addAll(classScanner.getOneToManyFields(cl));
+            collFields.addAll(classScanner.getManyToManyFields(cl));
+
+            for (Field field : objFields) {
+                field.setAccessible(true);
+                Object fieldValue = field.get(obj);
+                if (fieldValue != null && !identityMap.containsValue(fieldValue)) {
+                    objectsToSave.add(fieldValue);
+                    setIdForObjects(fieldValue);
+                }
+                field.setAccessible(false);
+            }
+
+            for (Field field : collFields) {
+                field.setAccessible(true);
+                Collection<?> collection = (Collection<?>) field.get(obj);
+                if (collection == null)
+                    continue;
+                for (Object fieldValue : collection) {
+                    if (fieldValue != null && !identityMap.containsValue(fieldValue)) {
+                        objectsToSave.add(fieldValue);
+                        setIdForObjects(fieldValue);
+                    }
+                }
+                field.setAccessible(false);
+            }
+        }
+    }
 }
