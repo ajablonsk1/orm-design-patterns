@@ -1,8 +1,8 @@
 {
   "packages": ["orm.test"],
-  "user": "root",
+  "user": "admin",
   "password": "password",
-  "database_url": "jdbc:mysql://localhost:3306/test",
-  "database_name": "test",
+  "database_url": "jdbc:mysql://localhost:3306/pholowi1",
+  "database_name": "pholowi1",
   "create_schema_on_start": true
 }

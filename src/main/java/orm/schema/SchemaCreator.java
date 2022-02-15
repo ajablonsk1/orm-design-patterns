@@ -7,7 +7,6 @@ import orm.session.Executor;
 import orm.sql.CommandType;
 import orm.sql.Query;
 import orm.sql.QueryBuilder;
-import orm.utils.Config;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -30,9 +29,15 @@ public class SchemaCreator {
     }
 
     public void createSchema() throws Exception {
-        entityClasses = finder.findEntityClasses();
+        Schema dbSchema = DatabaseSchemaLoader.loadDatabaseSchema(executor);
+        Schema srcSchema = SourceSchemaLoader.loadSourceSchema();
+
+        if (! dbSchema.isIdTableExists()){
+            addQueryForIdTable();
+        }
+
+
         dropAllTables();
-        addQueryForIdTable();
         addQueriesToCreateTables();
         addQueriesForOneToOnes();
         //przy One-to-Many mamy fk w innej tabeli, więc nie potrzeba zapytań
@@ -42,6 +47,7 @@ public class SchemaCreator {
         // przy strategii Class Table Inheritance nie potrzeba tu dodatkowego kodu do obsługi dziedziczenia
         executor.execute(queries);
     }
+
 
     public void dropAllTables() throws Exception {
         queries.add(new QueryBuilder(CommandType.SET)
