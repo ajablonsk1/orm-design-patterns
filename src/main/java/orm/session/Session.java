@@ -26,7 +26,7 @@ public class Session {
         Map<Integer, Object> identityMap = new HashMap<>();
         objectLoader = new ObjectLoader(executor, identityMap);
         objectSaver = new ObjectSaver(executor, identityMap, objectsToSave, idGiver);
-        objectUpdater = new ObjectUpdater(objectsToUpdate, executor);
+        objectUpdater = new ObjectUpdater(objectsToUpdate, executor, objectSaver);
         objectDeleter = new ObjectDeleter(executor, identityMap, objectsToDelete);
     }
 

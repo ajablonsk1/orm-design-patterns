@@ -98,9 +98,17 @@ public class ObjectSaver {
 
 
     public void saveAll() {
+        for (Object object : objectsToSave) {
+            try {
+                addObjectsFromRelations(object);
+            } catch (SQLException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
         for (Object object: objectsToSave){
             try {
-                setIdForObjects(object);
+                setIdForObject(object);
             } catch (SQLException | IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -120,6 +128,30 @@ public class ObjectSaver {
                 insertManyToManys(clazz, object);
             }
         }
+    }
+
+    void saveObject(Object obj) {
+        try {
+            addObjectToSave(obj);
+        } catch (IllegalAccessException | SQLException e) {
+            e.printStackTrace();
+        }
+
+        for (Object object: objectsToSave) {
+            insertRecord(object.getClass(), object);
+            for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass()))
+                insertRecord(clazz, object);
+        }
+
+        for (Object object: objectsToSave) {
+            setForeignKeys(object.getClass(), object);
+            insertManyToManys(object.getClass(), object);
+            for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass())){
+                setForeignKeys(clazz, object);
+                insertManyToManys(clazz, object);
+            }
+        }
+        objectsToSave.clear();
     }
 
     private void insertManyToManys(Class<?> cl, Object object) {
@@ -158,14 +190,23 @@ public class ObjectSaver {
         }
     }
 
-    private void setIdForObjects(Object obj) throws IllegalAccessException, SQLException {
-        if (identityMap.containsValue(obj))
+    private void addObjectToSave(Object obj) throws IllegalAccessException, SQLException {
+        if (obj == null || identityMap.containsKey(idService.getObjectId(obj)))
             return;
+        objectsToSave.add(obj);
+        addObjectsFromRelations(obj);
+    }
 
-        int id = idGiver.getId();
+    private void setIdForObject(Object obj) throws IllegalAccessException, SQLException {
+        Integer id = idService.getObjectId(obj);
+        if (id == null || id == 0) {
+            id = idGiver.getId();
+        }
         identityMap.put(id, obj);
         idService.setObjectId(obj, id);
+    }
 
+    private void addObjectsFromRelations(Object obj) throws IllegalAccessException, SQLException {
         List<Class<?>> classes = new ArrayList<>();
         classes.add(obj.getClass());
         classes.addAll(classScanner.getParentEntityClasses(obj.getClass()));
@@ -182,10 +223,7 @@ public class ObjectSaver {
             for (Field field : objFields) {
                 field.setAccessible(true);
                 Object fieldValue = field.get(obj);
-                if (fieldValue != null && !identityMap.containsValue(fieldValue)) {
-                    objectsToSave.add(fieldValue);
-                    setIdForObjects(fieldValue);
-                }
+                addObjectToSave(fieldValue);
                 field.setAccessible(false);
             }
 
@@ -195,10 +233,7 @@ public class ObjectSaver {
                 if (collection == null)
                     continue;
                 for (Object fieldValue : collection) {
-                    if (fieldValue != null && !identityMap.containsValue(fieldValue)) {
-                        objectsToSave.add(fieldValue);
-                        setIdForObjects(fieldValue);
-                    }
+                    addObjectToSave(fieldValue);
                 }
                 field.setAccessible(false);
             }
