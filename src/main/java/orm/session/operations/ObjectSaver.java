@@ -13,9 +13,7 @@ import javax.sql.rowset.CachedRowSet;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ObjectSaver {
 
@@ -100,13 +98,17 @@ public class ObjectSaver {
 
 
     public void saveAll() {
+        for (Object object : objectsToSave) {
+            try {
+                addObjectsFromRelations(object);
+            } catch (SQLException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
         for (Object object: objectsToSave){
             try {
-                if (!identityMap.containsValue(object)) {
-                    int id = idGiver.getId();
-                    identityMap.put(id, object);
-                    idService.setObjectId(object, id);
-                }
+                setIdForObject(object);
             } catch (SQLException | IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -126,6 +128,30 @@ public class ObjectSaver {
                 insertManyToManys(clazz, object);
             }
         }
+    }
+
+    void saveObject(Object obj) {
+        try {
+            addObjectToSave(obj);
+        } catch (IllegalAccessException | SQLException e) {
+            e.printStackTrace();
+        }
+
+        for (Object object: objectsToSave) {
+            insertRecord(object.getClass(), object);
+            for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass()))
+                insertRecord(clazz, object);
+        }
+
+        for (Object object: objectsToSave) {
+            setForeignKeys(object.getClass(), object);
+            insertManyToManys(object.getClass(), object);
+            for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass())){
+                setForeignKeys(clazz, object);
+                insertManyToManys(clazz, object);
+            }
+        }
+        objectsToSave.clear();
     }
 
     private void insertManyToManys(Class<?> cl, Object object) {
@@ -164,5 +190,53 @@ public class ObjectSaver {
         }
     }
 
+    private void addObjectToSave(Object obj) throws IllegalAccessException, SQLException {
+        if (obj == null || identityMap.containsKey(idService.getObjectId(obj)))
+            return;
+        objectsToSave.add(obj);
+        addObjectsFromRelations(obj);
+    }
 
+    private void setIdForObject(Object obj) throws IllegalAccessException, SQLException {
+        Integer id = idService.getObjectId(obj);
+        if (id == null || id == 0) {
+            id = idGiver.getId();
+        }
+        identityMap.put(id, obj);
+        idService.setObjectId(obj, id);
+    }
+
+    private void addObjectsFromRelations(Object obj) throws IllegalAccessException, SQLException {
+        List<Class<?>> classes = new ArrayList<>();
+        classes.add(obj.getClass());
+        classes.addAll(classScanner.getParentEntityClasses(obj.getClass()));
+
+        for (Class<?> cl : classes) {
+            List<Field> objFields = new ArrayList<>();
+            objFields.addAll(classScanner.getOneToOneFields(cl));
+            objFields.addAll(classScanner.getManyToOneFields(cl));
+
+            List<Field> collFields = new ArrayList<>();
+            collFields.addAll(classScanner.getOneToManyFields(cl));
+            collFields.addAll(classScanner.getManyToManyFields(cl));
+
+            for (Field field : objFields) {
+                field.setAccessible(true);
+                Object fieldValue = field.get(obj);
+                addObjectToSave(fieldValue);
+                field.setAccessible(false);
+            }
+
+            for (Field field : collFields) {
+                field.setAccessible(true);
+                Collection<?> collection = (Collection<?>) field.get(obj);
+                if (collection == null)
+                    continue;
+                for (Object fieldValue : collection) {
+                    addObjectToSave(fieldValue);
+                }
+                field.setAccessible(false);
+            }
+        }
+    }
 }

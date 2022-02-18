@@ -20,10 +20,12 @@ public class ObjectUpdater {
     private final Executor executor;
     private final ClassScanner classScanner = new ClassScanner();
     private final IdService idService = new IdService();
+    private final ObjectSaver objectSaver;
 
-    public ObjectUpdater(Set<Object> objectsToUpdate, Executor executor){
+    public ObjectUpdater(Set<Object> objectsToUpdate, Executor executor, ObjectSaver objectSaver){
         this.objectsToUpdate = objectsToUpdate;
         this.executor = executor;
+        this.objectSaver = objectSaver;
     }
 
     private void updateRecord(Class<?> cl, Object object) {
@@ -53,6 +55,17 @@ public class ObjectUpdater {
                 updateForeignKeyValue(cl, object, thisId, field);
             }
 
+            for (Field field : classScanner.getOneToManyFields(cl)) {
+                field.setAccessible(true);
+                Collection<?> collection = (Collection<?>) field.get(object);
+                if (collection != null) {
+                    for (Object obj : collection) {
+                        objectSaver.saveObject(obj);
+                    }
+                }
+                field.setAccessible(false);
+            }
+
             for (Field field : classScanner.getManyToManyFields(cl)){
                 field.setAccessible(true);
                 String tableName = field.getAnnotation(ManyToMany.class).tableName();
@@ -72,13 +85,18 @@ public class ObjectUpdater {
                     otherObjectIdsInDatabase.add(crs.getInt(1));
                 }
 
-                Object obj = field.get(object);
+                Object fieldValue = field.get(object);
                 Set<?> otherObjectsActual;
-                if (obj != null) {
-                    otherObjectsActual = new HashSet<>(((Collection<?>) field.get(object)));
+                if (fieldValue != null) {
+                    otherObjectsActual = new HashSet<>(((Collection<?>) fieldValue));
                 } else {
                     otherObjectsActual = new HashSet<>();
                 }
+
+                for (Object obj : otherObjectsActual) {
+                    objectSaver.saveObject(obj);
+                }
+
                 Set<Integer> otherObjectIdsActual = new HashSet<>();
                 for (Object o: otherObjectsActual){
                     otherObjectIdsActual.add(idService.getObjectId(o));
@@ -120,12 +138,16 @@ public class ObjectUpdater {
     }
 
     private void updateForeignKeyValue(Class<?> cl, Object object, Integer thisId, Field field) throws IllegalAccessException {
+        field.setAccessible(true);
+        Object fieldValue = field.get(object);
+        objectSaver.saveObject(fieldValue);
         QueryBuilder qb = new QueryBuilder(CommandType.UPDATE);
         qb.addTable(cl);
         String columnName = field.getName() + "_id";
-        qb.setColumn(columnName, idService.getObjectId(field.get(object)));
+        qb.setColumn(columnName, idService.getObjectId(fieldValue));
         qb.addCondition("id = " + thisId);
         executor.execute(qb.build());
+        field.setAccessible(false);
     }
 
     public void updateAll() {
