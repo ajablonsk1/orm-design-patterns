@@ -21,7 +21,6 @@ public class Config {
     private final String password;
     private final String databaseUrl;
     private final String databaseName;
-    private boolean createSchemaOnStart;
 
     private Config() throws Exception {
         URL configUrl = getClass().getClassLoader().getResource("orm_config.json");
@@ -44,11 +43,6 @@ public class Config {
         password = json.getAsJsonObject().get("password").getAsString();
         databaseUrl = json.getAsJsonObject().get("database_url").getAsString();
         databaseName = json.getAsJsonObject().get("database_name").getAsString();
-        try {
-            createSchemaOnStart = json.getAsJsonObject().get("create_schema_on_start").getAsBoolean();
-        } catch (Exception e){
-            createSchemaOnStart = true;
-        }
         reader.close();
     }
 
@@ -86,9 +80,5 @@ public class Config {
 
     public String getDatabaseName() {
         return databaseName;
-    }
-
-    public boolean isCreateSchemaOnStart() {
-        return createSchemaOnStart;
     }
 }

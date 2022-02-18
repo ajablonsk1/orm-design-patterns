@@ -11,10 +11,7 @@ public class SessionFactory {
     private SessionFactory () {
         try {
             this.connectionPool = new ConnectionPool();
-            SchemaUpdater schemaUpdater = new SchemaUpdater(connectionPool);
-            if (Config.getInstance().isCreateSchemaOnStart()) {
-                schemaUpdater.updateSchema();
-            }
+            new SchemaUpdater(connectionPool).updateSchema();
             session = ThreadLocal.withInitial(() -> null);
         } catch (Exception e) {
             e.printStackTrace();
