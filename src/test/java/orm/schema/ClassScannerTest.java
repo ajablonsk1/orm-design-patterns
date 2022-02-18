@@ -3,6 +3,7 @@ package orm.schema;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import orm.annotations.*;
+import orm.schema.reflect.ClassScanner;
 
 import java.lang.reflect.Field;
 import java.util.List;

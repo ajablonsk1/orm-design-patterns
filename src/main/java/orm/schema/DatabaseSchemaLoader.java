@@ -1,5 +1,8 @@
 package orm.schema;
 
+import orm.schema.columns.ForeignKeyColumn;
+import orm.schema.columns.PrimaryKeyColumn;
+import orm.schema.columns.SimpleColumn;
 import orm.session.Executor;
 import orm.sql.CommandType;
 import orm.sql.QueryBuilder;
@@ -10,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DatabaseSchemaLoader {
     public static Schema loadDatabaseSchema(Executor executor) throws Exception {
@@ -62,9 +64,9 @@ public class DatabaseSchemaLoader {
             var refTable = crs.getString("REFERENCED_TABLE_NAME");
             SimpleColumn column;
             if (columnName.equals("id"))
-                continue;
+                column = new PrimaryKeyColumn();
             else if (columnKey.equals("MUL")){
-                column = new ForeignKeyColumn(columnName, refTable);
+                column = new ForeignKeyColumn(columnName, tableName, refTable);
             } else {
                 column = new SimpleColumn(columnName, columnType);
             }

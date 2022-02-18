@@ -1,10 +1,13 @@
 package orm.schema;
 
-import com.google.gson.Gson;
 import orm.annotations.ManyToMany;
 import orm.annotations.OneToOne;
+import orm.schema.columns.ForeignKeyColumn;
+import orm.schema.columns.PrimaryKeyColumn;
+import orm.schema.columns.SimpleColumn;
+import orm.schema.reflect.ClassFinder;
+import orm.schema.reflect.ClassScanner;
 import orm.session.operations.AssociationTableService;
-import orm.test.OneToOneCl;
 import orm.utils.SqlTypes;
 import orm.utils.Utils;
 
@@ -22,16 +25,20 @@ public class SourceSchemaLoader {
         var scanner = new ClassScanner();
         for (Class<?> clazz : entityClasses){
             Set<SimpleColumn> columns = schema.addTable(clazz);
+            String classLowercase = clazz.getSimpleName().toLowerCase();
+            if (scanner.getIdField(clazz) != null){
+                addIdColumn(columns);
+            }
             for (Field field: scanner.getColumns(clazz)){
                 addSimpleColumn(columns, field);
             }
             for (Field field: scanner.getOneToOneFields(clazz)){
                 if (field.getAnnotation(OneToOne.class).foreignKeyInThisTable()){
-                    addForeignKeyColumn(columns, field);
+                    addForeignKeyColumn(columns, classLowercase, field);
                 }
             }
             for (Field field: scanner.getManyToOneFields(clazz)){
-                addForeignKeyColumn(columns, field);
+                addForeignKeyColumn(columns, classLowercase, field);
             }
             
             for (Field field: scanner.getManyToManyFields(clazz)){
@@ -45,11 +52,16 @@ public class SourceSchemaLoader {
         return schema;
     }
 
+    private static void addIdColumn(Set<SimpleColumn> columns){
+        columns.add(new PrimaryKeyColumn());
+    }
+
     private static void addColumnToAssociationTable(Schema schema, Field field, String associationTableName) {
         schema.getTables()
                 .get(associationTableName)
                 .add(new ForeignKeyColumn(
                         AssociationTableService.getColumnNameForField(field),
+                        associationTableName,
                         Utils.getInsideClassNameLowercase(field)));
     }
 
@@ -57,8 +69,8 @@ public class SourceSchemaLoader {
         columns.add(new SimpleColumn(field.getName().toLowerCase(), SqlTypes.getType(field.getType())));
     }
 
-    private static void addForeignKeyColumn(Set<SimpleColumn> columns, Field field) {
-        columns.add(new ForeignKeyColumn(field.getName().toLowerCase() + "_id", field.getType().getSimpleName().toLowerCase()));
+    private static void addForeignKeyColumn(Set<SimpleColumn> columns, String table, Field field) {
+        columns.add(new ForeignKeyColumn(field.getName().toLowerCase() + "_id", table, field.getType().getSimpleName().toLowerCase()));
     }
 
 

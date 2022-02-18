@@ -1,7 +1,7 @@
 package orm.schema;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import orm.schema.columns.SimpleColumn;
 
 import java.util.HashMap;
 import java.util.HashSet;
