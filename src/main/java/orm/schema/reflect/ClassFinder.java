@@ -1,4 +1,4 @@
-package orm.schema;
+package orm.schema.reflect;
 
 import orm.annotations.Entity;
 import orm.utils.Config;

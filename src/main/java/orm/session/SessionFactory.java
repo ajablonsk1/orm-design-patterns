@@ -1,6 +1,6 @@
 package orm.session;
 
-import orm.schema.SchemaCreator;
+import orm.schema.SchemaUpdater;
 import orm.utils.Config;
 
 public class SessionFactory {
@@ -11,9 +11,9 @@ public class SessionFactory {
     private SessionFactory () {
         try {
             this.connectionPool = new ConnectionPool();
-            SchemaCreator schemaCreator = new SchemaCreator(connectionPool);
+            SchemaUpdater schemaUpdater = new SchemaUpdater(connectionPool);
             if (Config.getInstance().isCreateSchemaOnStart()) {
-                schemaCreator.createSchema();
+                schemaUpdater.updateSchema();
             }
             session = ThreadLocal.withInitial(() -> null);
         } catch (Exception e) {

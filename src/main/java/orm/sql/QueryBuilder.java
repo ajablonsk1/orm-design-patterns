@@ -1,5 +1,8 @@
 package orm.sql;
 
+import orm.schema.columns.ForeignKeyColumn;
+import orm.utils.SqlTypes;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
@@ -38,13 +41,16 @@ public class QueryBuilder {
             throw new IllegalStateException("Command type not set");
         }
         if (query.commandType == CommandType.CREATE || query.commandType == CommandType.ALTER) {
-            String type = getSqlTypeFromClass(field.getType());
+            String type = SqlTypes.getType(field.getType());
             query.columns.add(field.getName().toLowerCase() + " " + type);
         }
         if (query.commandType == CommandType.SELECT || query.commandType == CommandType.INSERT) {
             query.columns.add(field.getName().toLowerCase());
         }
         return this;
+    }
+    public QueryBuilder addColumn(String column){
+        return this.addColumn(column, null);
     }
 
     public QueryBuilder addColumn(String column, String type) {
@@ -65,13 +71,13 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder addForeignKey(String column, String referencedTable){
-        this.addColumn(column, "INT");
-        query.foreignKeys.add("FOREIGN KEY ("+column+") REFERENCES "+referencedTable+"(id)");
+    public QueryBuilder addForeignKeyConstraint(String column, String referencedTable, String constraintName){
+        //this.addColumn(column, "INT");
+        query.foreignKeys.add("CONSTRAINT "+constraintName+" FOREIGN KEY ("+column+") REFERENCES "+referencedTable+"(id)");
         return this;
     }
 
-    public QueryBuilder addForeignKey(Field field){
+    public QueryBuilder addForeignKeyConstraint(Field field, String tableName){
         String column = field.getName().toLowerCase() + "_id";
         Class<?> clazz = field.getType();
         String refTable;
@@ -89,7 +95,7 @@ public class QueryBuilder {
                     refTable = refTable.toLowerCase();
         }
         else refTable = clazz.getSimpleName().toLowerCase();
-        addForeignKey(column, refTable);
+        addForeignKeyConstraint(column, refTable, ForeignKeyColumn.getConstraintName(tableName, column, refTable));
         return this;
     }
 
@@ -106,6 +112,15 @@ public class QueryBuilder {
             throw new IllegalStateException("Command type not set");
         }
         query.values.add(value);
+        return this;
+    }
+
+    public QueryBuilder setDropColumn(String dropColumn){
+        query.dropColumn = dropColumn;
+        return this;
+    }
+    public QueryBuilder setDropForeignKey(String dropForeignKey){
+        query.dropForeignKey = dropForeignKey;
         return this;
     }
 
@@ -180,39 +195,5 @@ public class QueryBuilder {
 
     public Query build() {
         return query;
-    }
-
-    private String getSqlTypeFromClass(Class<?> cl) {
-        if (cl == String.class || cl == Character.class || cl == char.class) {
-            return "VARCHAR(50)";
-        }
-        if (cl == boolean.class || cl == Boolean.class) {
-            return "BOOLEAN";
-        }
-        if (cl == byte.class || cl == Byte.class) {
-            return "TINYINT";
-        }
-        if (cl == short.class || cl == Short.class) {
-            return "SMALLINT";
-        }
-        if (cl == int.class || cl == Integer.class) {
-            return "INT";
-        }
-        if (cl == long.class || cl == Long.class) {
-            return "BIGINT";
-        }
-        if (cl == float.class || cl == Float.class) {
-            return "FLOAT";
-        }
-        if (cl == double.class || cl == Double.class) {
-            return "DOUBLE";
-        }
-        if (cl == byte[].class) {
-            return "BLOB";
-        }
-        if (cl == Date.class) {
-            return "DATETIME";
-        }
-        return "Incorrect type";
     }
 }

@@ -2,7 +2,7 @@ package orm.session.operations;
 
 import orm.annotations.ManyToMany;
 import orm.annotations.OneToOne;
-import orm.schema.ClassScanner;
+import orm.schema.reflect.ClassScanner;
 import orm.session.Executor;
 import orm.sql.CommandType;
 import orm.session.IdGiver;

@@ -9,8 +9,5 @@ import orm.annotations.OneToOne;
 public class InheritingClass extends SimpleClass {
     @Id
     public int id;
-    @Column
-    public String name;
-    @OneToOne(foreignKeyInThisTable = true)
-    public OneToOneCl2 oneToOneCl2;
+
 }

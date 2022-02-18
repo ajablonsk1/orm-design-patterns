@@ -1,6 +1,6 @@
 package orm.session.operations;
 
-import orm.schema.ClassScanner;
+import orm.schema.reflect.ClassScanner;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
