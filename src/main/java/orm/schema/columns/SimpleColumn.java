@@ -1,5 +1,6 @@
 package orm.schema.columns;
 
+import java.util.Locale;
 import java.util.Objects;
 
 public class SimpleColumn {
@@ -36,6 +37,6 @@ public class SimpleColumn {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type);
+        return Objects.hash(name.toLowerCase(), type.toLowerCase());
     }
 }

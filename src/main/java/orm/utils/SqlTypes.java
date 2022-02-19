@@ -8,31 +8,31 @@ public class SqlTypes {
             return "varchar(50)";
         }
         if (cl == boolean.class || cl == Boolean.class) {
-            return "BOOLEAN";
+            return "boolean";
         }
         if (cl == byte.class || cl == Byte.class) {
-            return "TINYINT";
+            return "tinyint";
         }
         if (cl == short.class || cl == Short.class) {
-            return "SMALLINT";
+            return "smallint";
         }
         if (cl == int.class || cl == Integer.class) {
-            return "INT";
+            return "int";
         }
         if (cl == long.class || cl == Long.class) {
-            return "BIGINT";
+            return "bigint";
         }
         if (cl == float.class || cl == Float.class) {
-            return "FLOAT";
+            return "float";
         }
         if (cl == double.class || cl == Double.class) {
-            return "DOUBLE";
+            return "double";
         }
         if (cl == byte[].class) {
-            return "BLOB";
+            return "blob";
         }
         if (cl == Date.class) {
-            return "DATETIME";
+            return "datetime";
         }
         return "Incorrect type";
     }

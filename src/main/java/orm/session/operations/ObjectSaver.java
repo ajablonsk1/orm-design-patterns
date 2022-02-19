@@ -191,7 +191,7 @@ public class ObjectSaver {
     }
 
     private void addObjectToSave(Object obj) throws IllegalAccessException, SQLException {
-        if (obj == null || identityMap.containsKey(idService.getObjectId(obj)))
+        if  (objectsToSave.contains(obj) || obj == null || identityMap.containsKey(idService.getObjectId(obj)))
             return;
         objectsToSave.add(obj);
         addObjectsFromRelations(obj);

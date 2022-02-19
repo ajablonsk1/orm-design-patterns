@@ -35,6 +35,6 @@ public class ForeignKeyColumn extends SimpleColumn {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), refTable, table);
+        return Objects.hash(super.hashCode(), refTable.toLowerCase(), table.toLowerCase());
     }
 }
