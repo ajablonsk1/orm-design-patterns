@@ -1,5 +1,7 @@
 package orm.session;
 
+import orm.session.finder.Criteria;
+import orm.session.finder.QueryObject;
 import orm.session.operations.ObjectDeleter;
 import orm.session.operations.ObjectLoader;
 import orm.session.operations.ObjectSaver;
@@ -33,10 +35,24 @@ public class Session {
     public void save(Object object) {
         objectsToSave.add(object);
     }
+    public List<?> find(QueryObject qo){
+        try {
+            try {
+                return objectLoader.loadQuery(qo);
+            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 
     public Object load(Class<?> clazz, Integer id) {
         try {
-            return objectLoader.load(clazz, id);
+            return (objectLoader.load(clazz, id));
         } catch (Exception e) {
             e.printStackTrace();
         }

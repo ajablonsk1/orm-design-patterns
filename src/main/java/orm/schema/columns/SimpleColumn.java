@@ -32,11 +32,11 @@ public class SimpleColumn {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SimpleColumn column)) return false;
-        return name.equals(column.name) && type.equals(column.type);
+        return name.equals(column.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name.toLowerCase(), type.toLowerCase());
+        return Objects.hash(name.toLowerCase());
     }
 }

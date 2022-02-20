@@ -6,6 +6,7 @@ import orm.annotations.OneToMany;
 import orm.annotations.OneToOne;
 import orm.schema.reflect.ClassScanner;
 import orm.session.Executor;
+import orm.session.finder.QueryObject;
 import orm.sql.CommandType;
 import orm.sql.Query;
 import orm.sql.QueryBuilder;
@@ -27,6 +28,20 @@ public class ObjectLoader {
     public ObjectLoader(Executor executor, Map<Integer, Object> identityMap){
         this.executor = executor;
         this.identityMap = identityMap;
+    }
+    public List<Object> loadQuery(QueryObject qo) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        Query query = qo.build();
+
+        CachedRowSet cachedRowSet = executor.execute(query)
+                .orElseThrow(SQLException::new);
+        Class<?> clazz = qo.getClazz();
+
+        List<Object> container = new ArrayList<>();
+        while (cachedRowSet.next()){
+            Integer ids = cachedRowSet.getInt("id");
+            container.add(load(clazz, ids));
+        }
+        return container;
     }
 
     public Object load(Class<?> clazz, Integer id) throws NoSuchMethodException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -121,6 +136,9 @@ public class ObjectLoader {
             Integer otherId = field.getAnnotation(OneToOne.class).foreignKeyInThisTable()
                     ? cachedRowSet.getInt(entityName + "_id")
                     : findKey(entityName, id, clazz.toString().toLowerCase() + "_id");
+            if (otherId == 0){
+                return null;
+            }
             fieldValue = load(fieldType, otherId);
         } catch (Exception e){
             e.printStackTrace();
@@ -149,6 +167,7 @@ public class ObjectLoader {
         if (set.next()) {
             return set.getInt(1);
         }
+
         throw new Exception("Record referenced by foreign key does not exist");
     }
     private Object getManyToManyFieldValue(Class<?> clazz, Integer id, Field field) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -171,7 +190,6 @@ public class ObjectLoader {
         while (set.next()){
             Integer ids = set.getInt(1);
             container.add(load(otherClass, ids));
-
         }
         fieldValue = container;
         return fieldValue;
