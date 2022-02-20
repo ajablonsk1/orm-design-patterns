@@ -138,10 +138,19 @@ public class ObjectSaver {
             e.printStackTrace();
         }
 
-        for (Object object: objectsToSave) {
-            insertRecord(object.getClass(), object);
-            for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass()))
-                insertRecord(clazz, object);
+        try {
+            if (idService.getObjectId(obj) == 0){
+                int id = idGiver.getId();
+                idService.setObjectId(obj, id);
+            }
+
+            for (Object object: objectsToSave) {
+                insertRecord(object.getClass(), object);
+                for (Class<?> clazz : classScanner.getParentEntityClasses(object.getClass()))
+                    insertRecord(clazz, object);
+            }
+        } catch (IllegalAccessException | SQLException e) {
+            e.printStackTrace();
         }
 
         for (Object object: objectsToSave) {
