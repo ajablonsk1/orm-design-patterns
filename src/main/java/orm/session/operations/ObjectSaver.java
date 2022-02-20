@@ -8,6 +8,8 @@ import orm.sql.CommandType;
 import orm.session.IdGiver;
 import orm.sql.Query;
 import orm.sql.QueryBuilder;
+import orm.utils.AssociationTableService;
+import orm.utils.IdService;
 
 import javax.sql.rowset.CachedRowSet;
 import java.lang.reflect.AccessibleObject;

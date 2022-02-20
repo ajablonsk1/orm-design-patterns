@@ -6,6 +6,8 @@ import orm.schema.reflect.ClassScanner;
 import orm.session.Executor;
 import orm.sql.CommandType;
 import orm.sql.QueryBuilder;
+import orm.utils.AssociationTableService;
+import orm.utils.IdService;
 
 import javax.sql.rowset.CachedRowSet;
 import java.lang.reflect.Field;

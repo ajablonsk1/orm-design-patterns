@@ -1,4 +1,4 @@
-package orm.session.operations;
+package orm.utils;
 
 import orm.schema.reflect.ClassScanner;
 

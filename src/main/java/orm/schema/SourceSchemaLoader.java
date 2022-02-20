@@ -7,7 +7,7 @@ import orm.schema.columns.PrimaryKeyColumn;
 import orm.schema.columns.SimpleColumn;
 import orm.schema.reflect.ClassFinder;
 import orm.schema.reflect.ClassScanner;
-import orm.session.operations.AssociationTableService;
+import orm.utils.AssociationTableService;
 import orm.utils.SqlTypes;
 import orm.utils.Utils;
 
