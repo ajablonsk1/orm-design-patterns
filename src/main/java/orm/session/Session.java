@@ -12,7 +12,7 @@ import java.util.*;
 public class Session {
     private final Set<Object> objectsToUpdate = new HashSet<>();
     private final Set<Object> objectsToDelete = new HashSet<>();
-    private final Set<Object> objectsToSave = new HashSet<>();
+    private final LinkedHashSet<Object> objectsToSave = new LinkedHashSet<>();
 
     private final ObjectLoader objectLoader;
     private final ObjectSaver objectSaver;

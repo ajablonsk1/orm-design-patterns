@@ -21,10 +21,10 @@ public class ObjectSaver {
     private final ClassScanner classScanner = new ClassScanner();
     private final Executor executor;
     private final Map<Integer, Object> identityMap;
-    private final Set<Object> objectsToSave;
+    private final LinkedHashSet<Object> objectsToSave;
     private final IdService idService = new IdService();
 
-    public ObjectSaver(Executor executor, Map<Integer, Object> identityMap, Set<Object> objectsToSave, IdGiver idGiver){
+    public ObjectSaver(Executor executor, Map<Integer, Object> identityMap, LinkedHashSet<Object> objectsToSave, IdGiver idGiver){
         this.executor = executor;
         this.identityMap = identityMap;
         this.objectsToSave = objectsToSave;
@@ -98,7 +98,8 @@ public class ObjectSaver {
 
 
     public void saveAll() {
-        for (Object object : objectsToSave) {
+        for (int i = 0; i < objectsToSave.size(); i++) {
+            Object object = new ArrayList<>(objectsToSave).get(i);
             try {
                 addObjectsFromRelations(object);
             } catch (SQLException | IllegalAccessException e) {
