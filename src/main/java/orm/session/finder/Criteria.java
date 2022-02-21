@@ -29,33 +29,34 @@ public class Criteria {
     }
 
     //greater  than
-    public static Criteria gt(String fieldName,Object value){
+    public static Criteria gt(String fieldName, Number value){
         return new Criteria(">",fieldName,value);
     }
-
-
     //greather than or equal
-    public static Criteria ge(String fieldName,Object value){
+    public static Criteria ge(String fieldName, Number value){
         return new Criteria(">=",fieldName,value);
 
     }
     //less than
-    public static Criteria lt(String fieldName,Object value){
+    public static Criteria lt(String fieldName,Number value){
         return new Criteria("<",fieldName,value);
     }
     //less than or equal
-    public static Criteria le(String fieldName,double value){
+    public static Criteria le(String fieldName,Number value){
         return new Criteria("<=",fieldName,value);
     }
     //equal
-    public static Criteria eq(String fieldName,String value){
+    public static Criteria eq(String fieldName,Number value){
         return new Criteria("=",fieldName,value);
     }
     public static Criteria eq(String fieldName,Object value){
         return new Criteria("=",fieldName,value);
     }
     //not equal
-    public static Criteria ne(String fieldName,String value){
+    public static Criteria ne(String fieldName,Number value){
+        return new Criteria("!=",fieldName,value);
+    }
+    public static Criteria ne(String fieldName,Object value){
         return new Criteria("!=",fieldName,value);
     }
     public static Criteria isNull(String fieldName){
@@ -66,12 +67,19 @@ public class Criteria {
         return new Criteria("SQL",fieldName + " IS NOT NULL");
 
     }
+
+    public static Criteria like(String fieldName, String regex){
+        return new Criteria("SQL", fieldName + " LIKE '" + regex + "'");
+    }
+
     public static Criteria and(Criteria lft , Criteria rhs){
         return new Criteria("AND",lft,rhs);
-
     }
     public static Criteria or(Criteria lft , Criteria rhs){
         return new Criteria("or",lft,rhs);
+    }
+    public static Criteria not(Criteria c){
+        return new Criteria("not", c, null);
     }
     public static Criteria sqlRestriction(String sqlRestriction){
         return new Criteria("SQL",sqlRestriction);
@@ -109,6 +117,9 @@ public class Criteria {
         }
         if (op.equals("SQL")){
             return SQL;
+        }
+        if (op.equals("not")){
+            return "NOT (" + lft.generateSql() + ")";
         }
         throw new IllegalStateException();
 
