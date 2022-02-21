@@ -112,6 +112,16 @@ public class ObjectUpdater {
                         .filter(id -> !otherObjectIdsActual.contains(id))
                         .collect(Collectors.toSet());
 
+                for (Integer id: idsToInsert){
+                    QueryBuilder qb = new QueryBuilder(CommandType.INSERT);
+                    qb.addTable(tableName)
+                            .addColumn(thisColumn, "")
+                            .addColumn(otherColumn, "")
+                            .addValue(thisId)
+                            .addValue(id);
+                    System.out.println("sdfsdfzzzz");
+                    executor.execute(qb.build());
+                }
 
                 for (Integer id: idsToDelete){
                     QueryBuilder qb = new QueryBuilder(CommandType.DELETE);
