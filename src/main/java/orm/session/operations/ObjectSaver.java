@@ -141,10 +141,7 @@ public class ObjectSaver {
         }
 
         try {
-            if (idService.getObjectId(obj) == 0){
-                int id = idGiver.getId();
-                idService.setObjectId(obj, id);
-            }
+            setIdForObject(obj);
 
             for (Object object: objectsToSave) {
                 insertRecord(object.getClass(), object);
