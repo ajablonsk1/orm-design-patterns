@@ -59,11 +59,11 @@ public class Criteria {
         return new Criteria("!=",fieldName,value);
     }
     public static Criteria isNull(String fieldName){
-        return new Criteria("=",fieldName,null);
+        return new Criteria("SQL",fieldName + " IS NULL");
 
     }
     public static Criteria isNotNull(String fieldName){
-        return new Criteria("!=",fieldName,null);
+        return new Criteria("SQL",fieldName + " IS NOT NULL");
 
     }
     public static Criteria and(Criteria lft , Criteria rhs){

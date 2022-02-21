@@ -49,6 +49,10 @@ public class ObjectLoader {
         if (! objectsBeingLoaded.containsKey(id) && identityMap.containsKey(id))
             return identityMap.get(id);
 
+        if (id == 0){
+            return null;
+        }
+
         Object instance;
         if (objectsBeingLoaded.containsKey(id)) // instancja już istnieje (utworzona na niższym poziomie)
             instance = objectsBeingLoaded.get(id);
@@ -93,7 +97,6 @@ public class ObjectLoader {
                 fieldValue = getManyToManyFieldValue(clazz,id,field);
 
             }else {
-                //Only primitive
                 fieldValue = cachedRowSet.getObject(field.getName().toLowerCase());
             }
             setField(instance, field, fieldValue);
