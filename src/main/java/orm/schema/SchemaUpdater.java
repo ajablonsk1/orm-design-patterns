@@ -42,25 +42,17 @@ public class SchemaUpdater {
         dbSchema = DatabaseSchemaLoader.loadDatabaseSchema(executor);
         srcSchema = SourceSchemaLoader.loadSourceSchema();
 
-        System.out.println("SOURCE SCHEMA");
-        System.out.println(srcSchema);
-        System.out.println("DATABASE SCHEMA");
-        System.out.println(dbSchema);
-
         tablesToDrop = dbSchema.getTables().keySet().stream()
                 .filter(t -> ! srcSchema.getTables().containsKey(t))
                 .collect(Collectors.toSet());
-        System.out.println("TABLES TO DROP: " + tablesToDrop);
 
         tablesToKeep = dbSchema.getTables().keySet().stream()
                 .filter(t -> srcSchema.getTables().containsKey(t))
                 .collect(Collectors.toSet());
-        System.out.println("TABLES TO KEEP: " + tablesToKeep);
 
         tablesToAdd = srcSchema.getTables().keySet().stream()
                 .filter(t -> ! dbSchema.getTables().containsKey(t))
                 .collect(Collectors.toSet());
-        System.out.println("TABLES TO ADD: " + tablesToAdd);
 
         if (! dbSchema.isIdTableExists()){
             addQueryForIdTable();
