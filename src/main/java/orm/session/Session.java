@@ -35,7 +35,7 @@ public class Session {
     public void save(Object object) {
         objectsToSave.add(object);
     }
-    public List<?> find(QueryObject qo){
+    private List<?> find(QueryObject qo){
         try {
             try {
                 return objectLoader.loadQuery(qo);
@@ -45,7 +45,13 @@ public class Session {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return new ArrayList<>();
+    }
+
+    public List<?> find(Class<?> clazz, Criteria criteria){
+        QueryObject qo = new QueryObject(clazz);
+        qo.setCriteria(criteria);
+        return find(qo);
     }
 
 
